@@ -1,0 +1,100 @@
+{
+ "actions": [],
+ "creation": "2026-10-18 19:30:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "default_bank_account",
+  "commission_expense_account",
+  "column_break_3",
+  "commission_vat_account",
+  "vat_rate_on_commission",
+  "section_break_6",
+  "settlement_regex",
+  "date_tolerance_days",
+  "amount_tolerance"
+ ],
+ "fields": [
+  {
+   "fieldname": "default_bank_account",
+   "fieldtype": "Link",
+   "label": "الحساب البنكي الافتراضي",
+   "options": "Account"
+  },
+  {
+   "fieldname": "commission_expense_account",
+   "fieldtype": "Link",
+   "label": "حساب مصروف عمولات مدى",
+   "options": "Account",
+   "reqd": 1,
+   "description": "حساب المصروف في شجرة الحسابات (مثل عمولات ومصاريف بنكية)"
+  },
+  {
+   "fieldname": "column_break_3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "commission_vat_account",
+   "fieldtype": "Link",
+   "label": "حساب ضريبة مدخلات عمولة البنك",
+   "options": "Account",
+   "description": "ضريبة القيمة المضافة المحسومة على عمولة البنك"
+  },
+  {
+   "default": "15",
+   "fieldname": "vat_rate_on_commission",
+   "fieldtype": "Percent",
+   "label": "نسبة الضريبة على العمولة (%)"
+  },
+  {
+   "fieldname": "section_break_6",
+   "fieldtype": "Section Break",
+   "label": "إعدادات وقواعد المطابقة الذكية"
+  },
+  {
+   "default": "Term\\s*(\\d{8})",
+   "fieldname": "settlement_regex",
+   "fieldtype": "Data",
+   "label": "النمط النصي لاستخراج رقم الجهاز (TID Regex)"
+  },
+  {
+   "default": "2",
+   "fieldname": "date_tolerance_days",
+   "fieldtype": "Int",
+   "label": "سماحية فرق التاريخ بالأيام (Date Tolerance)"
+  },
+  {
+   "default": "0.05",
+   "fieldname": "amount_tolerance",
+   "fieldtype": "Float",
+   "label": "سماحية فرق المبلغ (Amount Tolerance)"
+  }
+ ],
+ "issingle": 1,
+ "links": [],
+ "modified": "2026-10-18 19:30:00.000000",
+ "modified_by": "Administrator",
+ "module": "Mu Reconciliation",
+ "name": "Mada Reconciliation Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "read": 1,
+   "role": "Accounts Manager",
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

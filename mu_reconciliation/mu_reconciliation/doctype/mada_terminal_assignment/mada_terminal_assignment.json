@@ -1,0 +1,71 @@
+{
+ "actions": [],
+ "creation": "2026-10-18 19:30:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "assigned_employee",
+  "assigned_user",
+  "assigned_date",
+  "column_break_4",
+  "returned_date",
+  "reason",
+  "notes"
+ ],
+ "fields": [
+  {
+   "fieldname": "assigned_employee",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "الموظف / السائق",
+   "options": "Employee"
+  },
+  {
+   "fieldname": "assigned_user",
+   "fieldtype": "Link",
+   "label": "المستخدم",
+   "options": "User"
+  },
+  {
+   "default": "Now",
+   "fieldname": "assigned_date",
+   "fieldtype": "Datetime",
+   "in_list_view": 1,
+   "label": "تاريخ ووقت الاستلام",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "returned_date",
+   "fieldtype": "Datetime",
+   "in_list_view": 1,
+   "label": "تاريخ الإرجاع"
+  },
+  {
+   "fieldname": "reason",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "سبب التسليم / الاستبدال"
+  },
+  {
+   "fieldname": "notes",
+   "fieldtype": "Small Text",
+   "label": "ملاحظات"
+  }
+ ],
+ "istable": 1,
+ "links": [],
+ "modified": "2026-10-18 19:30:00.000000",
+ "modified_by": "Administrator",
+ "module": "Mu Reconciliation",
+ "name": "Mada Terminal Assignment",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

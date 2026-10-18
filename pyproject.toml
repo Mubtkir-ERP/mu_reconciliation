@@ -1,0 +1,19 @@
+[project]
+name = "mu_reconciliation"
+authors = [
+    { name = "Mubtkir", email = "info@mubtkir.com"}
+]
+description = "Mubtkir MADA POS & Bank Statement Reconciliation"
+requires-python = ">=3.10"
+readme = "README.md"
+dynamic = ["version"]
+dependencies = [
+    "erpnext",
+    "openpyxl>=3.0.0",
+    "xlrd>=2.0.1",
+    "pypdf>=3.0.0"
+]
+
+[build-system]
+requires = ["flit_core >=3.4,<4"]
+build-backend = "flit_core.buildapi"

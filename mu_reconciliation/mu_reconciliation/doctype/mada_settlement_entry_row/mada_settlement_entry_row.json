@@ -1,0 +1,99 @@
+{
+ "actions": [],
+ "creation": "2026-10-18 19:30:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "terminal",
+  "terminal_id",
+  "batch_no",
+  "settlement_date",
+  "amount",
+  "column_break_6",
+  "employee",
+  "transaction_count",
+  "reconciliation_status",
+  "notes"
+ ],
+ "fields": [
+  {
+   "fieldname": "terminal",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "جهاز مدى",
+   "options": "Mada Terminal",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "terminal.terminal_id",
+   "fieldname": "terminal_id",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "رقم الجهاز (TID)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "batch_no",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "رقم الموازنة (Batch No)"
+  },
+  {
+   "default": "Today",
+   "fieldname": "settlement_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "تاريخ الموازنة",
+   "reqd": 1
+  },
+  {
+   "fieldname": "amount",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "مبلغ الموازنة",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_6",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "terminal.current_employee",
+   "fieldname": "employee",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "السائق / الموظف",
+   "options": "Employee"
+  },
+  {
+   "fieldname": "transaction_count",
+   "fieldtype": "Int",
+   "label": "عدد الحركات"
+  },
+  {
+   "default": "معلق / في الانتظار",
+   "fieldname": "reconciliation_status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "حالة المطابقة بالبنك",
+   "options": "معلق / في الانتظار\nمطابق بالبنك 🟢\nعجز / زيادة 🔴"
+  },
+  {
+   "fieldname": "notes",
+   "fieldtype": "Data",
+   "label": "ملاحظات"
+  }
+ ],
+ "istable": 1,
+ "links": [],
+ "modified": "2026-10-18 19:30:00.000000",
+ "modified_by": "Administrator",
+ "module": "Mu Reconciliation",
+ "name": "Mada Settlement Entry Row",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
