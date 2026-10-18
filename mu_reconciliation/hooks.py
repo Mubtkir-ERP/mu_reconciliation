@@ -8,6 +8,7 @@ app_publisher = "Mubtkir"
 app_description = "نظام مطابقة مبيعات شبكة مدى وموازنات الأجهزة مع كشوف الحسابات البنكية"
 app_email = "info@mubtkir.com"
 app_license = "mit"
+required_apps = ["erpnext"]
 
 # Includes in <head>
 # ------------------
