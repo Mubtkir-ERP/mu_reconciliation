@@ -1,0 +1,148 @@
+{
+ "charts": [],
+ "content": "[{\"id\":\"hdr1\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>اختصارات المطابقة</b></span>\",\"col\":12}},{\"id\":\"sc1\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"تسجيل موازنة مدى\",\"col\":3}},{\"id\":\"sc2\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"مطابقة كشف الحساب البنكي\",\"col\":3}},{\"id\":\"sc3\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"أجهزة مدى\",\"col\":3}},{\"id\":\"sc4\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"تقرير حالة المطابقة\",\"col\":3}},{\"id\":\"sp1\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"hdr2\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>العمليات والتقارير</b></span>\",\"col\":12}},{\"id\":\"card1\",\"type\":\"card\",\"data\":{\"card_name\":\"الموازنات وأجهزة مدى\",\"col\":4}},{\"id\":\"card2\",\"type\":\"card\",\"data\":{\"card_name\":\"المطابقة البنكية والتقارير\",\"col\":4}},{\"id\":\"card3\",\"type\":\"card\",\"data\":{\"card_name\":\"الإعدادات\",\"col\":4}}]",
+ "creation": "2026-10-19 15:45:00.000000",
+ "custom_blocks": [],
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "hide_custom": 0,
+ "icon": "credit-card",
+ "idx": 0,
+ "indicator_color": "blue",
+ "is_hidden": 0,
+ "label": "Mu Reconciliation",
+ "links": [
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "الموازنات وأجهزة مدى",
+   "link_count": 3,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "تسجيل موازنة مدى",
+   "link_count": 0,
+   "link_to": "Mada Settlement Entry",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "أجهزة مدى",
+   "link_count": 0,
+   "link_to": "Mada Terminal",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "تعيين أجهزة مدى",
+   "link_count": 0,
+   "link_to": "Mada Terminal Assignment",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "المطابقة البنكية والتقارير",
+   "link_count": 2,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "مطابقة كشف الحساب البنكي",
+   "link_count": 0,
+   "link_to": "Mada Bank Reconciliation",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "تقرير حالة مطابقة مدى",
+   "link_count": 0,
+   "link_to": "Mada Reconciliation Status",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "الإعدادات",
+   "link_count": 1,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "إعدادات مطابقة مدى",
+   "link_count": 0,
+   "link_to": "Mada Reconciliation Settings",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  }
+ ],
+ "modified": "2026-10-19 15:45:00.000000",
+ "modified_by": "Administrator",
+ "module": "Mu Reconciliation",
+ "name": "Mu Reconciliation",
+ "number_cards": [],
+ "owner": "Administrator",
+ "public": 1,
+ "quick_lists": [],
+ "roles": [],
+ "sequence_id": 25.0,
+ "shortcuts": [
+  {
+   "color": "Blue",
+   "doc_view": "List",
+   "label": "تسجيل موازنة مدى",
+   "link_to": "Mada Settlement Entry",
+   "stats_filter": "[]",
+   "type": "DocType"
+  },
+  {
+   "color": "Green",
+   "doc_view": "List",
+   "label": "مطابقة كشف الحساب البنكي",
+   "link_to": "Mada Bank Reconciliation",
+   "stats_filter": "[]",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "أجهزة مدى",
+   "link_to": "Mada Terminal",
+   "stats_filter": "[]",
+   "type": "DocType"
+  },
+  {
+   "color": "Orange",
+   "doc_view": "",
+   "label": "تقرير حالة المطابقة",
+   "link_to": "Mada Reconciliation Status",
+   "stats_filter": "[]",
+   "type": "Report"
+  }
+ ],
+ "title": "مطابقة مدى"
+}
