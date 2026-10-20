@@ -6,7 +6,7 @@ import csv
 import io
 import os
 import re
-from datetime import datetime
+from datetime import datetime, timedelta
 import frappe
 from frappe.utils import flt, getdate
 
@@ -17,7 +17,7 @@ def clean_number(val):
     """Normalize and convert text to float, supporting Arabic numbers and comma decimals."""
     if val is None or val == "":
         return 0.0
-    s = str(val).translate(ARABIC_DIGITS).replace("٬", "").replace(",", "").strip()
+    s = str(val).translate(ARABIC_DIGITS).replace("٬", "").replace(",", "").replace(" ", "").strip()
     try:
         return flt(s)
     except Exception:
@@ -31,15 +31,39 @@ def parse_date_str(val):
     if isinstance(val, (datetime,)):
         return val.strftime("%Y-%m-%d")
     s = str(val).translate(ARABIC_DIGITS).strip()
+    
+    # Try excel serial float
+    try:
+        f = float(s)
+        if 35000 < f < 65000:
+            return (datetime(1899, 12, 30) + timedelta(days=int(f))).strftime("%Y-%m-%d")
+    except Exception:
+        pass
+
+    # Standard date formats
     for fmt in ("%Y-%m-%d", "%d/%m/%Y", "%m/%d/%Y", "%d-%m-%Y", "%Y/%m/%d"):
         try:
             return datetime.strptime(s, fmt).strftime("%Y-%m-%d")
         except ValueError:
             pass
-    try:
-        return str(getdate(s))
-    except Exception:
-        return None
+
+    # Regex search for YYYY-MM-DD inside text
+    m = re.search(r"\b(202\d[-/]\d{1,2}[-/]\d{1,2})\b", s)
+    if m:
+        try:
+            return str(getdate(m.group(1).replace("/", "-")))
+        except Exception:
+            pass
+
+    # Regex search for DD/MM/YYYY
+    m = re.search(r"\b(\d{1,2}/\d{1,2}/202\d)\b", s)
+    if m:
+        try:
+            return datetime.strptime(m.group(1), "%d/%m/%Y").strftime("%Y-%m-%d")
+        except Exception:
+            pass
+
+    return None
 
 
 def parse_bank_file(file_path):
@@ -48,23 +72,10 @@ def parse_bank_file(file_path):
     - Excel: .xls (BIFF8), .xlsx
     - Delimited: .csv, .txt
     - Documents: .pdf
-    
-    Returns a list of dicts:
-    [
-        {
-            "terminal_id": "15691146",
-            "date": "2026-10-12",
-            "credit": 703.00,
-            "commission": 5.25,
-            "batch_no": "000149",
-            "description": "..."
-        },
-        ...
-    ]
     """
     ext = os.path.splitext(file_path)[1].lower()
 
-    if ext == ".csv" or ext == ".txt":
+    if ext in (".csv", ".txt"):
         return parse_csv(file_path)
     elif ext == ".xlsx":
         return parse_xlsx(file_path)
@@ -73,11 +84,10 @@ def parse_bank_file(file_path):
     elif ext == ".pdf":
         return parse_pdf(file_path)
     else:
-        # Fallback trial
         try:
-            return parse_xlsx(file_path)
-        except Exception:
             return parse_xls(file_path)
+        except Exception:
+            return parse_xlsx(file_path)
 
 
 def parse_csv(file_path):
@@ -91,7 +101,7 @@ def parse_csv(file_path):
             continue
 
     reader = csv.reader(io.StringIO(text))
-    rows = [r for r in reader]
+    rows = [[str(c).strip() for c in r] for r in reader]
     return extract_mada_records_from_table(rows)
 
 
@@ -101,23 +111,45 @@ def parse_xlsx(file_path):
     ws = wb.active
     rows = []
     for r in ws.iter_rows(values_only=True):
-        rows.append([str(c) if c is not None else "" for c in r])
+        row_vals = []
+        for c in r:
+            if isinstance(c, (datetime,)):
+                row_vals.append(c.strftime("%Y-%m-%d"))
+            elif isinstance(c, float) and 35000 < c < 65000:
+                dt_str = parse_date_str(c)
+                row_vals.append(dt_str or str(c))
+            elif c is not None:
+                row_vals.append(str(c).strip())
+            else:
+                row_vals.append("")
+        rows.append(row_vals)
     wb.close()
     return extract_mada_records_from_table(rows)
 
 
 def parse_xls(file_path):
-    """Parse legacy .xls using xlrd, or fallback to ole/string scanner."""
+    """Parse legacy .xls using xlrd with proper Excel date decoding."""
     try:
         import xlrd
         wb = xlrd.open_workbook(file_path)
         ws = wb.sheet_by_index(0)
         rows = []
         for rx in range(ws.nrows):
-            rows.append([str(ws.cell_value(rx, cx)) for cx in range(ws.ncols)])
+            row_vals = []
+            for cx in range(ws.ncols):
+                val = ws.cell_value(rx, cx)
+                c_type = ws.cell_type(rx, cx)
+                if c_type == xlrd.XL_CELL_DATE or (isinstance(val, float) and 35000 < val < 65000):
+                    try:
+                        dt = xlrd.xldate_as_datetime(val, wb.datemode).strftime("%Y-%m-%d")
+                        row_vals.append(dt)
+                        continue
+                    except Exception:
+                        pass
+                row_vals.append(str(val).strip())
+            rows.append(row_vals)
         return extract_mada_records_from_table(rows)
     except Exception:
-        # Fallback parser using regex on text streams
         return parse_text_stream(file_path)
 
 
@@ -144,7 +176,6 @@ def parse_pdf(file_path):
 def parse_text_stream(file_path):
     with open(file_path, "rb") as f:
         content = f.read()
-    # Extract readable strings
     strings = re.findall(rb"[\x20-\x7E\xA0-\xFF]{4,}", content)
     lines = [s.decode("latin1", errors="ignore") for s in strings]
     return parse_text_lines(lines)
@@ -155,8 +186,7 @@ def extract_mada_records_from_table(rows):
     Parses structured tabular data (from Excel/CSV).
     Pairs Batch Deposits with their corresponding Commission rows.
     """
-    records = []
-    # Key: (TID, Date, BatchNo) -> {credit, commission, description}
+    # Key: (TID, Date, BatchNo) -> dict
     batch_map = {}
 
     for row in rows:
@@ -178,28 +208,34 @@ def extract_mada_records_from_table(rows):
                 txn_date = d
                 break
 
+        # Fallback date search in entire row_str
+        if not txn_date:
+            date_m = re.search(r"\b(202\d-\d{2}-\d{2})\b", row_str)
+            if date_m:
+                txn_date = date_m.group(1)
+
         # Extract batch number if present (6 digits sequence)
-        batch_no = None
+        batch_no = ""
         batch_match = re.search(r"\b(\d{6})\b", row_str)
         if batch_match:
             batch_no = batch_match.group(1)
 
-        # Extract numbers from row (potential amounts)
+        # Extract amounts: find numbers in cells
         amounts = []
         for cell in row:
             val = clean_number(cell)
             if val != 0.0:
-                amounts.append(val)
+                amounts.append(abs(val))
 
-        # Identify credit / debit
-        amount = abs(amounts[-1]) if amounts else 0.0
+        # Amount is typically in the last numeric columns
+        amount = amounts[-1] if amounts else 0.0
 
         key = (tid, txn_date, batch_no or "ALL")
         if key not in batch_map:
             batch_map[key] = {
                 "terminal_id": tid,
                 "date": txn_date,
-                "batch_no": batch_no or "",
+                "batch_no": batch_no,
                 "credit": 0.0,
                 "commission": 0.0,
                 "description": row_str[:120]
