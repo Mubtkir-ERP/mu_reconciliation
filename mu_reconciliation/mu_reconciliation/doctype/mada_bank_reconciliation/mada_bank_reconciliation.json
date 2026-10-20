@@ -31,7 +31,7 @@
    "default": "MADA-RECON-.YYYY.-.#####",
    "fieldname": "naming_series",
    "fieldtype": "Select",
-   "label": "سلسلة الترقيم",
+   "label": "Naming Series",
    "options": "MADA-RECON-.YYYY.-.#####",
    "reqd": 1
   },
@@ -39,15 +39,15 @@
    "fieldname": "title",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "عنوان كشف المطابقة",
+   "label": "Statement Title",
    "reqd": 1,
-   "description": "مثال: مطابقة الأسبوع الثاني من أكتوبر - بنك الراجحي"
+   "description": "e.g. Al Rajhi Bank Reconciliation - Week 2 Oct 2026"
   },
   {
    "fieldname": "bank_account",
    "fieldtype": "Link",
    "in_list_view": 1,
-   "label": "الحساب البنكي",
+   "label": "Bank Account",
    "options": "Account",
    "reqd": 1
   },
@@ -56,7 +56,7 @@
    "fieldname": "status",
    "fieldtype": "Select",
    "in_list_view": 1,
-   "label": "حالة المطابقة",
+   "label": "Status",
    "options": "Draft\nParsed\nReconciled\nCommission Created",
    "read_only": 1
   },
@@ -69,7 +69,7 @@
    "fieldname": "from_date",
    "fieldtype": "Date",
    "in_list_view": 1,
-   "label": "من تاريخ",
+   "label": "From Date",
    "reqd": 1
   },
   {
@@ -77,33 +77,33 @@
    "fieldname": "to_date",
    "fieldtype": "Date",
    "in_list_view": 1,
-   "label": "إلى تاريخ",
+   "label": "To Date",
    "reqd": 1
   },
   {
    "fieldname": "bank_statement_file",
    "fieldtype": "Attach",
-   "label": "ملف كشف الحساب البنكي (Excel أو PDF أو CSV)",
+   "label": "Bank Statement File (Excel, PDF, or CSV)",
    "reqd": 1,
-   "description": "يدعم صيغ .xlsx, .xls, .csv, .pdf"
+   "description": "Supports .xlsx, .xls, .csv, .pdf"
   },
   {
    "fieldname": "section_break_9",
    "fieldtype": "Section Break",
-   "label": "ملخص المبالغ والنتائج"
+   "label": "Reconciliation Summary & Totals"
   },
   {
    "fieldname": "total_bank_deposits",
    "fieldtype": "Currency",
    "in_list_view": 1,
-   "label": "إجمالي إيداعات مدى في البنك",
+   "label": "Total Bank Deposits",
    "read_only": 1
   },
   {
    "fieldname": "total_bank_commissions",
    "fieldtype": "Currency",
    "in_list_view": 1,
-   "label": "إجمالي عمولات البنك",
+   "label": "Total Bank Commissions",
    "read_only": 1
   },
   {
@@ -114,45 +114,45 @@
    "fieldname": "total_matched_amount",
    "fieldtype": "Currency",
    "in_list_view": 1,
-   "label": "إجمالي المبالغ المطابقة 🟢",
+   "label": "Total Matched Amount 🟢",
    "read_only": 1
   },
   {
    "fieldname": "total_missing_in_bank",
    "fieldtype": "Currency",
    "in_list_view": 1,
-   "label": "المبالغ المعلقة / المفقودة من البنك 🔴",
+   "label": "Missing / Pending in Bank 🔴",
    "read_only": 1
   },
   {
    "fieldname": "total_unmatched_in_system",
    "fieldtype": "Currency",
-   "label": "إيداعات بنكية بدون موازنة 🟡",
+   "label": "Unmatched Deposits 🟡",
    "read_only": 1
   },
   {
    "fieldname": "commission_journal_entry",
    "fieldtype": "Link",
-   "label": "سند قيد العمولة البنكية المولد",
+   "label": "Commission Journal Entry",
    "options": "Journal Entry",
    "read_only": 1
   },
   {
    "fieldname": "section_break_17",
    "fieldtype": "Section Break",
-   "label": "حركات مدى المستخرجة من كشف الحساب البنكي والمطابقة"
+   "label": "Extracted Bank Statement Transactions"
   },
   {
    "fieldname": "statement_rows",
    "fieldtype": "Table",
-   "label": "حركات الكشف البنكي",
+   "label": "Statement Rows",
    "options": "Mada Bank Statement Row"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-10-18 19:30:00.000000",
+ "modified": "2026-10-19 21:50:00.000000",
  "modified_by": "Administrator",
  "module": "Mu Reconciliation",
  "name": "Mada Bank Reconciliation",
@@ -195,9 +195,7 @@
    "write": 1
   }
  ],
- "search_fields": "title,bank_account,status",
  "sort_field": "modified",
  "sort_order": "DESC",
- "states": [],
- "title_field": "title"
+ "states": []
 }

@@ -1,0 +1,36 @@
+Bank Reconciliation,مطابقة كشف الحساب البنكي
+Mada Settlement Entry,تسجيل موازنة أجهزة مدى
+Mada Bank Reconciliation,مطابقة كشف الحساب البنكي لمدى
+Mada Terminal,أجهزة مدى
+Mada Terminal Assignment,تعيين أجهزة مدى
+Mada Reconciliation Settings,إعدادات مطابقة مدى
+Mada Reconciliation Status,تقرير حالة مطابقة مدى
+1. Parse Statement,1. قراءة وتحليل الكشف
+2. Reconcile Transactions,2. إجراء المطابقة الذكية
+3. Create Commission Entry,3. توليد قيد العمولة البنكية
+Statement Title,عنوان كشف المطابقة
+Bank Account,الحساب البنكي
+Bank Statement File,ملف كشف الحساب البنكي
+Total Bank Deposits,إجمالي إيداعات مدى في البنك
+Total Bank Commissions,إجمالي عمولات البنك
+Total Matched Amount,إجمالي المبالغ المطابقة
+Missing / Pending in Bank,المبالغ المعلقة / المفقودة من البنك
+Unmatched Deposits,إيداعات بنكية بدون موازنة
+Commission Journal Entry,سند قيد العمولة البنكية
+Statement Rows,حركات الكشف البنكي
+Transaction Date,تاريخ الحركة بالبنك
+Terminal ID (TID),رقم الجهاز (TID)
+Batch No,رقم الموازنة (Batch No)
+Deposit Amount (Credit),المبلغ المودع بالبنك (دائن)
+Commission (Debit),العمولة المخصومة (مدين)
+Reconciliation Status,حالة المطابقة
+Matched Settlement Entry,سند الموازنة المطابق
+Statement Description,بيان الحركة البنكية
+Settlement Amount,مبلغ الموازنة
+Settlement Date,تاريخ الموازنة
+Driver / Employee,السائق / الموظف
+Mada Terminal Settlement Details,تفاصيل موازنات أجهزة مدى
+Reconciled with Bank 🟢,مطابق بالبنك 🟢
+Pending / Unreconciled 🔴,معلق / غير مودع 🔴
+Unmatched Deposit 🟡,إيداع بدون موازنة 🟡
+Matched 🟢,مطابق 🟢

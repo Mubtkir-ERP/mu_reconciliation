@@ -28,23 +28,23 @@
    "fieldname": "terminal_id",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "رقم الجهاز (TID)",
+   "label": "Terminal ID (TID)",
    "reqd": 1,
    "unique": 1,
-   "description": "معرف جهاز مدى (8 أرقام كما تظهر في البنك والإيصال مثل 15691146)"
+   "description": "8-digit MADA Terminal identifier as printed on receipt/bank statement (e.g. 15691146)"
   },
   {
    "fieldname": "terminal_name",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "اسم أو مسمى الجهاز"
+   "label": "Terminal Name"
   },
   {
    "default": "Active",
    "fieldname": "status",
    "fieldtype": "Select",
    "in_list_view": 1,
-   "label": "الحالة",
+   "label": "Status",
    "options": "Active\nInactive\nUnder Maintenance"
   },
   {
@@ -55,37 +55,37 @@
    "fieldname": "branch",
    "fieldtype": "Link",
    "in_list_view": 1,
-   "label": "الفرع / الموقع",
+   "label": "Branch / Location",
    "options": "Branch"
   },
   {
    "fieldname": "company",
    "fieldtype": "Link",
-   "label": "الشركة",
+   "label": "Company",
    "options": "Company"
   },
   {
    "fieldname": "bank_account",
    "fieldtype": "Link",
-   "label": "الحساب البنكي المرتبط",
+   "label": "Associated Bank Account",
    "options": "Bank Account"
   },
   {
    "fieldname": "section_break_8",
    "fieldtype": "Section Break",
-   "label": "السائق / الموظف الحالي المسلم له الجهاز"
+   "label": "Current Custody / Assignment"
   },
   {
    "fieldname": "current_employee",
    "fieldtype": "Link",
    "in_list_view": 1,
-   "label": "السائق / الموظف الحالي",
+   "label": "Current Driver / Employee",
    "options": "Employee"
   },
   {
    "fieldname": "current_user",
    "fieldtype": "Link",
-   "label": "المستخدم الحالي",
+   "label": "Current System User",
    "options": "User"
   },
   {
@@ -95,29 +95,29 @@
   {
    "fieldname": "serial_no",
    "fieldtype": "Data",
-   "label": "الرقم التسلسلي (Serial No)"
+   "label": "Serial No"
   },
   {
    "fieldname": "model",
    "fieldtype": "Data",
-   "label": "نوع وموديل الجهاز"
+   "label": "Model / Device Type"
   },
   {
    "fieldname": "section_break_14",
    "fieldtype": "Section Break",
-   "label": "سجل تسليم واستلام الأجهزة بين الموظفين"
+   "label": "Terminal Custody History"
   },
   {
    "fieldname": "assignment_history",
    "fieldtype": "Table",
-   "label": "سجل التسليم والاستلام",
+   "label": "Assignment History",
    "options": "Mada Terminal Assignment"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-10-18 19:30:00.000000",
+ "modified": "2026-10-19 21:50:00.000000",
  "modified_by": "Administrator",
  "module": "Mu Reconciliation",
  "name": "Mada Terminal",

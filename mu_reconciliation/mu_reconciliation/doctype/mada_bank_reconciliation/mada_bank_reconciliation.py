@@ -25,7 +25,8 @@ class MadaBankReconciliation(Document):
             total_dep += dep
             total_comm += comm
 
-            if "مطابق" in (row.matched_status or ""):
+            status = row.matched_status or ""
+            if "Matched" in status or "مطابق" in status:
                 total_matched += dep
             else:
                 total_unmatched_bank += dep
@@ -37,29 +38,41 @@ class MadaBankReconciliation(Document):
 
     @frappe.whitelist()
     def parse_statement(self):
-        """قراءة واستخراج حركات مدى من ملف كشف الحساب البنكي المرفق (Excel أو PDF أو CSV)."""
+        """Parse and extract MADA transactions from uploaded bank statement file."""
         if not self.bank_statement_file:
-            frappe.throw(_("يرجى إرفاق ملف كشف الحساب البنكي أولاً."))
+            frappe.throw(_("Please attach the bank statement file first (Excel, PDF, or CSV)."))
 
         file_doc = frappe.get_doc("File", {"file_url": self.bank_statement_file})
         full_path = file_doc.get_full_path()
 
         records = parse_bank_file(full_path)
         if not records:
-            frappe.throw(_("لم يتم العثور على أي حركات مدى في الملف المرفق. تأكد من صحة الملف."))
+            frappe.throw(_("No MADA transactions found in the attached file. Please verify the file format."))
+
+        from_d = getdate(self.from_date) if self.from_date else None
+        to_d = getdate(self.to_date) if self.to_date else None
 
         self.set("statement_rows", [])
         added = 0
         for rec in records:
             if rec.get("credit", 0) > 0 or rec.get("commission", 0) > 0:
+                rec_date_str = rec.get("date")
+                rec_date = getdate(rec_date_str) if rec_date_str else None
+
+                # Filter strictly by date range if provided
+                if from_d and rec_date and rec_date < from_d:
+                    continue
+                if to_d and rec_date and rec_date > to_d:
+                    continue
+
                 self.append("statement_rows", {
-                    "txn_date": rec.get("date") or self.from_date or nowdate(),
-                    "terminal_id": rec.get("terminal_id"),
-                    "batch_no": rec.get("batch_no"),
+                    "txn_date": rec_date_str or self.from_date or nowdate(),
+                    "terminal_id": rec.get("terminal_id") or "",
+                    "batch_no": rec.get("batch_no") or "",
                     "credit_amount": rec.get("credit", 0.0),
                     "commission_amount": rec.get("commission", 0.0),
-                    "description": rec.get("description"),
-                    "matched_status": "معلق / غير مودع 🔴"
+                    "description": rec.get("description") or "",
+                    "matched_status": "Pending / Unreconciled 🔴"
                 })
                 added += 1
 
@@ -71,14 +84,14 @@ class MadaBankReconciliation(Document):
 
     @frappe.whitelist()
     def run_reconciliation(self):
-        """إجراء المطابقة الذكية بين إيداعات البنك وموازنات النظام المسجلة."""
+        """Intelligently reconcile bank statement deposits with system settlement entries."""
         if not self.statement_rows:
             self.parse_statement()
 
         from_d = self.from_date or "2000-01-01"
         to_d = self.to_date or "2099-12-31"
 
-        # 1. جلب موازنات النظام المسجلة في الفترة
+        # 1. Fetch system settlements within date range (support both Draft and Submitted)
         system_settlements = frappe.db.sql(
             """
             SELECT 
@@ -90,7 +103,7 @@ class MadaBankReconciliation(Document):
                 r.amount
             FROM `tabMada Settlement Entry Row` r
             INNER JOIN `tabMada Settlement Entry` p ON p.name = r.parent
-            WHERE p.docstatus = 1
+            WHERE p.docstatus < 2
               AND r.settlement_date BETWEEN %s AND %s
             """,
             (from_d, to_d),
@@ -103,45 +116,81 @@ class MadaBankReconciliation(Document):
         matched_system_rows = set()
         matched_count = 0
 
-        # 2. مطابقة سطور البنك مع النظام بناء على رقم الجهاز + التاريخ + المبلغ
+        # 2. Multi-tier Intelligent Matching
         for bank_row in self.statement_rows:
             b_tid = str(bank_row.terminal_id or "").strip()
-            b_date = str(bank_row.txn_date)
+            b_date = getdate(bank_row.txn_date) if bank_row.txn_date else None
             b_amt = flt(bank_row.credit_amount)
 
             if b_amt <= 0:
                 continue
 
-            # البحث عن مطابقة تامة: رقم الجهاز والمبلغ
             match = None
+
+            # Priority 1: Terminal ID + Amount + Date proximity (<= 3 days)
             for s in system_settlements:
                 if s.row_name in matched_system_rows:
                     continue
                 s_tid = str(s.terminal_id or "").strip()
                 s_amt = flt(s.amount)
-                # مطابقة رقم الجهاز والمبلغ (مع سماحية يومين في التاريخ لاختلاف وقت الإيداع البنكي)
-                if s_tid == b_tid and abs(s_amt - b_amt) < 0.05:
+                s_date = getdate(s.settlement_date) if s.settlement_date else None
+                days_diff = abs((b_date - s_date).days) if (b_date and s_date) else 999
+
+                if s_tid and b_tid and s_tid == b_tid and abs(s_amt - b_amt) < 0.05 and days_diff <= 3:
                     match = s
                     break
 
+            # Priority 2: Terminal ID + Amount (any date in statement period)
+            if not match:
+                for s in system_settlements:
+                    if s.row_name in matched_system_rows:
+                        continue
+                    s_tid = str(s.terminal_id or "").strip()
+                    s_amt = flt(s.amount)
+                    if s_tid and b_tid and s_tid == b_tid and abs(s_amt - b_amt) < 0.05:
+                        match = s
+                        break
+
+            # Priority 3: Exact Amount + Exact Date (even if TID didn't parse from statement)
+            if not match:
+                for s in system_settlements:
+                    if s.row_name in matched_system_rows:
+                        continue
+                    s_amt = flt(s.amount)
+                    s_date = getdate(s.settlement_date) if s.settlement_date else None
+                    if abs(s_amt - b_amt) < 0.05 and b_date and s_date and b_date == s_date:
+                        match = s
+                        break
+
+            # Priority 4: Exact Amount with Date proximity (<= 2 days)
+            if not match:
+                for s in system_settlements:
+                    if s.row_name in matched_system_rows:
+                        continue
+                    s_amt = flt(s.amount)
+                    s_date = getdate(s.settlement_date) if s.settlement_date else None
+                    days_diff = abs((b_date - s_date).days) if (b_date and s_date) else 999
+                    if abs(s_amt - b_amt) < 0.05 and days_diff <= 2:
+                        match = s
+                        break
+
             if match:
-                bank_row.matched_status = "مطابق 🟢"
+                bank_row.matched_status = "Matched 🟢"
                 bank_row.matched_entry = match.entry_name
                 matched_system_rows.add(match.row_name)
                 matched_count += 1
-                # تحديث سطر الموازنة في النظام
-                frappe.db.set_value("Mada Settlement Entry Row", match.row_name, "reconciliation_status", "مطابق بالبنك 🟢")
+                frappe.db.set_value("Mada Settlement Entry Row", match.row_name, "reconciliation_status", "Reconciled with Bank 🟢")
             else:
-                bank_row.matched_status = "إيداع بدون موازنة 🟡"
+                bank_row.matched_status = "Unmatched Deposit 🟡"
 
-        # 3. حساب المبالغ المعلقة / المفقودة من البنك (موجودة في النظام ولم تنزل في البنك)
+        # 3. Calculate missing in bank (recorded in system but not deposited in bank statement)
         missing_total = 0.0
         missing_list = []
         for s in system_settlements:
             if s.row_name not in matched_system_rows:
                 missing_total += flt(s.amount)
                 missing_list.append(s)
-                frappe.db.set_value("Mada Settlement Entry Row", s.row_name, "reconciliation_status", "معلق / في الانتظار")
+                frappe.db.set_value("Mada Settlement Entry Row", s.row_name, "reconciliation_status", "Pending / Unreconciled 🔴")
 
         self.total_missing_in_bank = missing_total
         self.status = "Reconciled"
@@ -158,13 +207,13 @@ class MadaBankReconciliation(Document):
 
     @frappe.whitelist()
     def create_commission_journal_entry(self):
-        """توليد قيد عمولات البنك المجمعة للأسبوع بضغطة زر واحدة."""
+        """Create and submit a Journal Entry for bank commissions."""
         if self.commission_journal_entry and frappe.db.exists("Journal Entry", self.commission_journal_entry):
-            frappe.throw(_("تم بالفعل توليد قيد العمولة لهذا الكشف: {0}").format(self.commission_journal_entry))
+            frappe.throw(_("Commission Journal Entry already exists: {0}").format(self.commission_journal_entry))
 
         total_comm = flt(self.total_bank_commissions)
         if total_comm <= 0:
-            frappe.throw(_("لا توجد مبالغ عمولات لتوليد القيد."))
+            frappe.throw(_("No commission amounts to create Journal Entry."))
 
         settings = frappe.get_single("Mada Reconciliation Settings")
         expense_acc = settings.commission_expense_account
@@ -173,17 +222,15 @@ class MadaBankReconciliation(Document):
         vat_rate = flt(settings.vat_rate_on_commission or 15.0)
 
         if not expense_acc:
-            frappe.throw(_("يرجى تحديد حساب مصروف عمولات مدى في شاشة إعدادات المطابقة."))
+            frappe.throw(_("Please specify MADA Commission Expense Account in Mada Reconciliation Settings."))
         if not bank_acc:
-            frappe.throw(_("يرجى اختيار الحساب البنكي أولاً."))
+            frappe.throw(_("Please select Bank Account first."))
 
-        # حساب ضريبة القيمة المضافة على العمولة
         company = frappe.db.get_value("Account", bank_acc, "company")
         vat_amount = 0.0
         net_expense = total_comm
 
         if vat_acc and vat_rate > 0:
-            # عمولة مدى عادة شاملة الضريبة: Net = Total / (1 + Rate)
             net_expense = flt(total_comm / (1.0 + (vat_rate / 100.0)), 2)
             vat_amount = flt(total_comm - net_expense, 2)
 
@@ -191,35 +238,30 @@ class MadaBankReconciliation(Document):
         je.voucher_type = "Bank Entry"
         je.company = company
         je.posting_date = self.to_date or nowdate()
-        je.user_remark = f"قيد إثبات عمولات شبكة مدى لكشف الفترة {self.from_date} إلى {self.to_date} - سند مطابقة: {self.name}"
+        je.user_remark = f"MADA Bank Commission Entry for period {self.from_date} to {self.to_date} - Ref: {self.name}"
 
-        # 1. طرف المدين: مصروف العمولات
         je.append("accounts", {
             "account": expense_acc,
             "debit_in_account_currency": net_expense,
             "credit_in_account_currency": 0,
-            "user_remark": "مصروف عمولة مدى"
+            "cost_center": frappe.db.get_value("Company", company, "cost_center")
         })
 
-        # 2. طرف المدين: ضريبة المدخلات على العمولة (إن وجدت)
         if vat_acc and vat_amount > 0:
             je.append("accounts", {
                 "account": vat_acc,
                 "debit_in_account_currency": vat_amount,
                 "credit_in_account_currency": 0,
-                "user_remark": f"ضريبة القيمة المضافة {vat_rate}% على عمولة مدى"
+                "cost_center": frappe.db.get_value("Company", company, "cost_center")
             })
 
-        # 3. طرف الدائن: حساب البنك
         je.append("accounts", {
             "account": bank_acc,
             "debit_in_account_currency": 0,
-            "credit_in_account_currency": total_comm,
-            "user_remark": "خصم عمولات مدى من رصيد البنك"
+            "credit_in_account_currency": total_comm
         })
 
-        je.flags.ignore_permissions = True
-        je.insert()
+        je.insert(ignore_permissions=True)
         je.submit()
 
         self.commission_journal_entry = je.name
@@ -227,8 +269,4 @@ class MadaBankReconciliation(Document):
         self.save()
         frappe.db.commit()
 
-        return {
-            "status": "success",
-            "journal_entry": je.name,
-            "total_commission": total_comm
-        }
+        return {"status": "success", "journal_entry": je.name}

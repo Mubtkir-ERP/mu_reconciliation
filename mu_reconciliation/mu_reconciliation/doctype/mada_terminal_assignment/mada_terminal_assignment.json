@@ -18,13 +18,13 @@
    "fieldname": "assigned_employee",
    "fieldtype": "Link",
    "in_list_view": 1,
-   "label": "الموظف / السائق",
+   "label": "Assigned Driver / Employee",
    "options": "Employee"
   },
   {
    "fieldname": "assigned_user",
    "fieldtype": "Link",
-   "label": "المستخدم",
+   "label": "Assigned System User",
    "options": "User"
   },
   {
@@ -32,7 +32,7 @@
    "fieldname": "assigned_date",
    "fieldtype": "Datetime",
    "in_list_view": 1,
-   "label": "تاريخ ووقت الاستلام",
+   "label": "Assignment Date & Time",
    "reqd": 1
   },
   {
@@ -43,23 +43,23 @@
    "fieldname": "returned_date",
    "fieldtype": "Datetime",
    "in_list_view": 1,
-   "label": "تاريخ الإرجاع"
+   "label": "Return Date & Time"
   },
   {
    "fieldname": "reason",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "سبب التسليم / الاستبدال"
+   "label": "Reason / Note"
   },
   {
    "fieldname": "notes",
    "fieldtype": "Small Text",
-   "label": "ملاحظات"
+   "label": "Notes"
   }
  ],
  "istable": 1,
  "links": [],
- "modified": "2026-10-18 19:30:00.000000",
+ "modified": "2026-10-19 21:50:00.000000",
  "modified_by": "Administrator",
  "module": "Mu Reconciliation",
  "name": "Mada Terminal Assignment",

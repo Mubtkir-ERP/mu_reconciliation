@@ -21,7 +21,7 @@
    "fieldname": "terminal",
    "fieldtype": "Link",
    "in_list_view": 1,
-   "label": "جهاز مدى",
+   "label": "Mada Terminal",
    "options": "Mada Terminal",
    "reqd": 1
   },
@@ -30,28 +30,28 @@
    "fieldname": "terminal_id",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "رقم الجهاز (TID)",
+   "label": "Terminal ID (TID)",
    "read_only": 1
   },
   {
    "fieldname": "batch_no",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "رقم الموازنة (Batch No)"
+   "label": "Batch No"
   },
   {
    "default": "Today",
    "fieldname": "settlement_date",
    "fieldtype": "Date",
    "in_list_view": 1,
-   "label": "تاريخ الموازنة",
+   "label": "Settlement Date",
    "reqd": 1
   },
   {
    "fieldname": "amount",
    "fieldtype": "Currency",
    "in_list_view": 1,
-   "label": "مبلغ الموازنة",
+   "label": "Settlement Amount",
    "reqd": 1
   },
   {
@@ -63,31 +63,31 @@
    "fieldname": "employee",
    "fieldtype": "Link",
    "in_list_view": 1,
-   "label": "السائق / الموظف",
+   "label": "Driver / Employee",
    "options": "Employee"
   },
   {
    "fieldname": "transaction_count",
    "fieldtype": "Int",
-   "label": "عدد الحركات"
+   "label": "Transaction Count"
   },
   {
-   "default": "معلق / في الانتظار",
+   "default": "Pending / Unreconciled 🔴",
    "fieldname": "reconciliation_status",
    "fieldtype": "Select",
    "in_list_view": 1,
-   "label": "حالة المطابقة بالبنك",
-   "options": "معلق / في الانتظار\nمطابق بالبنك 🟢\nعجز / زيادة 🔴"
+   "label": "Bank Reconciliation Status",
+   "options": "Pending / Unreconciled 🔴\nReconciled with Bank 🟢\nVariance / Discrepancy 🔴\nمعلق / في الانتظار\nمطابق بالبنك 🟢\nعجز / زيادة 🔴"
   },
   {
    "fieldname": "notes",
    "fieldtype": "Data",
-   "label": "ملاحظات"
+   "label": "Notes"
   }
  ],
  "istable": 1,
  "links": [],
- "modified": "2026-10-18 19:30:00.000000",
+ "modified": "2026-10-19 21:50:00.000000",
  "modified_by": "Administrator",
  "module": "Mu Reconciliation",
  "name": "Mada Settlement Entry Row",

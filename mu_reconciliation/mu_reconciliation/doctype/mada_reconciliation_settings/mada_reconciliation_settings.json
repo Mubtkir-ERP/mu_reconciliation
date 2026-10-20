@@ -18,16 +18,16 @@
   {
    "fieldname": "default_bank_account",
    "fieldtype": "Link",
-   "label": "الحساب البنكي الافتراضي",
+   "label": "Default Bank Account",
    "options": "Account"
   },
   {
    "fieldname": "commission_expense_account",
    "fieldtype": "Link",
-   "label": "حساب مصروف عمولات مدى",
+   "label": "MADA Commission Expense Account",
    "options": "Account",
    "reqd": 1,
-   "description": "حساب المصروف في شجرة الحسابات (مثل عمولات ومصاريف بنكية)"
+   "description": "Expense Account in Chart of Accounts (e.g. Bank Charges & Commissions)"
   },
   {
    "fieldname": "column_break_3",
@@ -36,43 +36,43 @@
   {
    "fieldname": "commission_vat_account",
    "fieldtype": "Link",
-   "label": "حساب ضريبة مدخلات عمولة البنك",
+   "label": "Commission VAT Input Account",
    "options": "Account",
-   "description": "ضريبة القيمة المضافة المحسومة على عمولة البنك"
+   "description": "VAT Input tax account on bank commissions"
   },
   {
    "default": "15",
    "fieldname": "vat_rate_on_commission",
    "fieldtype": "Percent",
-   "label": "نسبة الضريبة على العمولة (%)"
+   "label": "VAT Rate on Commission (%)"
   },
   {
    "fieldname": "section_break_6",
    "fieldtype": "Section Break",
-   "label": "إعدادات وقواعد المطابقة الذكية"
+   "label": "Reconciliation Rules & Tolerances"
   },
   {
    "default": "Term\\s*(\\d{8})",
    "fieldname": "settlement_regex",
    "fieldtype": "Data",
-   "label": "النمط النصي لاستخراج رقم الجهاز (TID Regex)"
+   "label": "Terminal ID Regex Pattern (TID)"
   },
   {
    "default": "2",
    "fieldname": "date_tolerance_days",
    "fieldtype": "Int",
-   "label": "سماحية فرق التاريخ بالأيام (Date Tolerance)"
+   "label": "Date Tolerance (Days)"
   },
   {
    "default": "0.05",
    "fieldname": "amount_tolerance",
    "fieldtype": "Float",
-   "label": "سماحية فرق المبلغ (Amount Tolerance)"
+   "label": "Amount Discrepancy Tolerance"
   }
  ],
  "issingle": 1,
  "links": [],
- "modified": "2026-10-18 19:30:00.000000",
+ "modified": "2026-10-19 21:50:00.000000",
  "modified_by": "Administrator",
  "module": "Mu Reconciliation",
  "name": "Mada Reconciliation Settings",
