@@ -215,14 +215,14 @@ def extract_mada_records_from_table(rows):
         row_str = " ".join(str(c) for c in row)
         
         # Match terminal ID with flexible labels (Term, Terminal, TID, جهاز, رقم الجهاز, POS)
-        match_tid = re.search(r"(?:Term|Terminal|TID|جهاز|رقم\s*الجهاز|POS)\s*[:#-]?\s*(\d{8})", row_str, re.IGNORECASE)
+        match_tid = re.search(r"(?:Term|Terminal|TID|جهاز|رقم\s*الجهاز|POS)\s*[:#-]?\s*(\d{8,16})", row_str, re.IGNORECASE)
         tid = ""
         if match_tid:
             tid = match_tid.group(1)
         else:
-            # Fallback: check if row mentions MADA / POS / Settlement and contains an 8-digit number
+            # Fallback: check if row mentions MADA / POS / Settlement and contains an 8-16 digit number
             if any(k in row_str.lower() for k in ("mada", "مدى", "pos", "point of sale", "عمولة", "تسوية", "شبكة", "deposit", "settlement")):
-                fallback_tid = re.search(r"\b(\d{8})\b", row_str)
+                fallback_tid = re.search(r"\b(\d{8,16})\b", row_str)
                 if fallback_tid:
                     tid = fallback_tid.group(1)
 

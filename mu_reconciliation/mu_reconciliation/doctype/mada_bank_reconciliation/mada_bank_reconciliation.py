@@ -117,22 +117,58 @@ class MadaBankReconciliation(Document):
         return {"status": "success", "rows_added": added, "total_in_file": total_in_file}
 
     @frappe.whitelist()
+    def on_cancel(self):
+        self.reset_reconciled_rows()
+
+    def on_trash(self):
+        self.reset_reconciled_rows()
+
+    def reset_reconciled_rows(self):
+        frappe.db.sql(
+            """
+            UPDATE `tabMada Settlement Entry Row`
+            SET reconciliation_status = 'Pending / Unreconciled 🔴',
+                bank_reconciliation = NULL
+            WHERE bank_reconciliation = %s
+            """,
+            (self.name,)
+        )
+
+    @frappe.whitelist()
     def run_reconciliation(self):
         """Intelligently reconcile bank statement deposits with system settlement entries."""
         if not self.statement_rows:
             self.parse_statement()
 
-        from datetime import timedelta
+        # Reset any previous matches for this document
+        self.reset_reconciled_rows()
+        for r in self.statement_rows:
+            r.matched_status = "Pending / Unreconciled 🔴"
+            r.matched_entry = None
+
         from_d = getdate(self.from_date) if self.from_date else getdate("2000-01-01")
         to_d = getdate(self.to_date) if self.to_date else getdate("2099-12-31")
 
-        # Query window: extend slightly (+/- 4 days) to account for weekend/holiday clearing delays
-        query_from = from_d - timedelta(days=4)
-        query_to = to_d + timedelta(days=4)
+        # 1. Fetch system settlements strictly within selected date range and for the selected bank account.
+        # Exclude settlements already reconciled in other documents.
+        bank_account_cond = ""
+        params = {
+            "from_date": from_d,
+            "to_date": to_d,
+            "bank_account": self.bank_account or "",
+            "current_doc": self.name
+        }
 
-        # 1. Fetch system settlements within date range (support both Draft and Submitted)
-        system_settlements = frappe.db.sql(
+        if self.bank_account:
+            bank_account_cond = """
+                AND (
+                    t.bank_account = %(bank_account)s 
+                    OR ba.account = %(bank_account)s
+                )
             """
+
+        system_settlements = frappe.db.sql(
+            f"""
             SELECT 
                 r.name as row_name,
                 r.parent as entry_name,
@@ -140,14 +176,26 @@ class MadaBankReconciliation(Document):
                 COALESCE(NULLIF(r.terminal_id, ''), t.terminal_id, r.terminal) as terminal_id,
                 r.batch_no,
                 COALESCE(r.settlement_date, p.entry_date) as settlement_date,
-                r.amount
+                r.amount,
+                r.reconciliation_status,
+                r.bank_reconciliation
             FROM `tabMada Settlement Entry Row` r
             INNER JOIN `tabMada Settlement Entry` p ON p.name = r.parent
             LEFT JOIN `tabMada Terminal` t ON t.name = r.terminal
+            LEFT JOIN `tabBank Account` ba ON ba.name = t.bank_account
             WHERE p.docstatus < 2
-              AND COALESCE(r.settlement_date, p.entry_date) BETWEEN %s AND %s
+              AND COALESCE(r.settlement_date, p.entry_date) BETWEEN %(from_date)s AND %(to_date)s
+              {bank_account_cond}
+              AND (
+                  r.bank_reconciliation = %(current_doc)s
+                  OR (
+                      COALESCE(r.reconciliation_status, '') NOT IN ('Reconciled with Bank 🟢', 'مطابق بالبنك 🟢')
+                      AND (r.bank_reconciliation IS NULL OR r.bank_reconciliation = '')
+                  )
+              )
+            ORDER BY COALESCE(r.settlement_date, p.entry_date) ASC
             """,
-            (query_from, query_to),
+            params,
             as_dict=True
         )
 
@@ -156,6 +204,21 @@ class MadaBankReconciliation(Document):
 
         matched_system_rows = set()
         matched_count = 0
+
+        def tid_matches(s_tid, b_tid, s_term):
+            if not b_tid:
+                return False
+            b_s = str(b_tid).strip()
+            s_s = str(s_tid or "").strip()
+            term_s = str(s_term or "").strip()
+            if s_s:
+                if s_s == b_s or s_s.startswith(b_s) or b_s.startswith(s_s):
+                    return True
+                if b_s in s_s or s_s in b_s:
+                    return True
+            if term_s and term_s == b_s:
+                return True
+            return False
 
         # 2. Multi-tier Intelligent Matching
         for bank_row in self.statement_rows:
@@ -171,68 +234,65 @@ class MadaBankReconciliation(Document):
 
             match = None
 
-            # Priority 1: Batch No match (when batch numbers are recorded)
+            # Priority 1: Batch No match + TID match (when batch numbers are recorded)
             if b_batch:
                 for s in system_settlements:
                     if s.row_name in matched_system_rows:
                         continue
                     s_batch = str(s.batch_no or "").strip()
                     s_amt = flt(s.amount)
-                    if s_batch and s_batch == b_batch:
-                        if abs(s_amt - b_amt) < 0.5 or abs(s_amt - b_net) < 0.5:
+                    amt_ok = (abs(s_amt - b_amt) < 0.05) or (abs(s_amt - b_net) < 0.05)
+                    tid_ok = tid_matches(s.terminal_id, b_tid, s.terminal)
+                    if s_batch and s_batch == b_batch and amt_ok:
+                        if not b_tid or tid_ok:
                             match = s
                             break
 
-            # Priority 2: Terminal ID + Amount (Gross or Net) + Proximity (<= 4 days)
+            # Priority 2: TID match + Exact Amount + Exact Date
             if not match and b_tid:
                 for s in system_settlements:
                     if s.row_name in matched_system_rows:
                         continue
-                    s_tid = str(s.terminal_id or "").strip()
                     s_amt = flt(s.amount)
                     s_date = getdate(s.settlement_date) if s.settlement_date else None
-                    days_diff = abs((b_date - s_date).days) if (b_date and s_date) else 999
-
-                    tid_matches = (s_tid and s_tid == b_tid) or (s.terminal and str(s.terminal).strip() == b_tid)
-                    amt_matches = (abs(s_amt - b_amt) < 0.05) or (abs(s_amt - b_net) < 0.05)
-
-                    if tid_matches and amt_matches and days_diff <= 4:
+                    amt_ok = (abs(s_amt - b_amt) < 0.05) or (abs(s_amt - b_net) < 0.05)
+                    if amt_ok and tid_matches(s.terminal_id, b_tid, s.terminal) and b_date and s_date and b_date == s_date:
                         match = s
                         break
 
-            # Priority 3: Exact Amount (Gross or Net) + Exact Date
-            if not match:
-                for s in system_settlements:
-                    if s.row_name in matched_system_rows:
-                        continue
-                    s_amt = flt(s.amount)
-                    s_date = getdate(s.settlement_date) if s.settlement_date else None
-                    amt_matches = (abs(s_amt - b_amt) < 0.05) or (abs(s_amt - b_net) < 0.05)
-                    if amt_matches and b_date and s_date and b_date == s_date:
-                        match = s
-                        break
-
-            # Priority 4: Exact Amount (Gross or Net) with Date Proximity (<= 3 days)
-            if not match:
+            # Priority 3: TID match + Exact Amount + Date Proximity (<= 2 days)
+            if not match and b_tid:
                 for s in system_settlements:
                     if s.row_name in matched_system_rows:
                         continue
                     s_amt = flt(s.amount)
                     s_date = getdate(s.settlement_date) if s.settlement_date else None
                     days_diff = abs((b_date - s_date).days) if (b_date and s_date) else 999
-                    amt_matches = (abs(s_amt - b_amt) < 0.05) or (abs(s_amt - b_net) < 0.05)
-                    if amt_matches and days_diff <= 3:
+                    amt_ok = (abs(s_amt - b_amt) < 0.05) or (abs(s_amt - b_net) < 0.05)
+                    if amt_ok and tid_matches(s.terminal_id, b_tid, s.terminal) and days_diff <= 2:
                         match = s
                         break
 
-            # Priority 5: Exact Amount (Gross or Net) anywhere within statement period
-            if not match:
+            # Priority 4: TID match + Exact Amount within statement period
+            if not match and b_tid:
                 for s in system_settlements:
                     if s.row_name in matched_system_rows:
                         continue
                     s_amt = flt(s.amount)
-                    amt_matches = (abs(s_amt - b_amt) < 0.05) or (abs(s_amt - b_net) < 0.05)
-                    if amt_matches:
+                    amt_ok = (abs(s_amt - b_amt) < 0.05) or (abs(s_amt - b_net) < 0.05)
+                    if amt_ok and tid_matches(s.terminal_id, b_tid, s.terminal):
+                        match = s
+                        break
+
+            # Priority 5 (Only when TID is not present in bank row): Exact Amount + Exact Date
+            if not match and not b_tid:
+                for s in system_settlements:
+                    if s.row_name in matched_system_rows:
+                        continue
+                    s_amt = flt(s.amount)
+                    s_date = getdate(s.settlement_date) if s.settlement_date else None
+                    amt_ok = (abs(s_amt - b_amt) < 0.05) or (abs(s_amt - b_net) < 0.05)
+                    if amt_ok and b_date and s_date and b_date == s_date:
                         match = s
                         break
 
@@ -241,7 +301,10 @@ class MadaBankReconciliation(Document):
                 bank_row.matched_entry = match.entry_name
                 matched_system_rows.add(match.row_name)
                 matched_count += 1
-                frappe.db.set_value("Mada Settlement Entry Row", match.row_name, "reconciliation_status", "Reconciled with Bank 🟢")
+                frappe.db.set_value("Mada Settlement Entry Row", match.row_name, {
+                    "reconciliation_status": "Reconciled with Bank 🟢",
+                    "bank_reconciliation": self.name
+                })
             else:
                 bank_row.matched_status = "Unmatched Deposit 🟡"
 
@@ -252,7 +315,10 @@ class MadaBankReconciliation(Document):
             if s.row_name not in matched_system_rows:
                 missing_total += flt(s.amount)
                 missing_list.append(s)
-                frappe.db.set_value("Mada Settlement Entry Row", s.row_name, "reconciliation_status", "Pending / Unreconciled 🔴")
+                frappe.db.set_value("Mada Settlement Entry Row", s.row_name, {
+                    "reconciliation_status": "Pending / Unreconciled 🔴",
+                    "bank_reconciliation": None
+                })
 
         self.total_missing_in_bank = missing_total
         self.status = "Reconciled"

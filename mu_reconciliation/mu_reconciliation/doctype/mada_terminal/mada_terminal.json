@@ -9,7 +9,6 @@
  "field_order": [
   "naming_series",
   "terminal_id",
-  "terminal_name",
   "status",
   "column_break_4",
   "branch",
@@ -40,13 +39,7 @@
    "label": "Terminal ID (TID)",
    "reqd": 1,
    "unique": 1,
-   "description": "8-digit MADA Terminal identifier as printed on receipt/bank statement (e.g. 15691146)"
-  },
-  {
-   "fieldname": "terminal_name",
-   "fieldtype": "Data",
-   "in_list_view": 1,
-   "label": "Terminal Name"
+   "description": "MADA Terminal identifier as printed on receipt/bank statement (TID)"
   },
   {
    "default": "Active",
@@ -169,9 +162,9 @@
    "write": 0
   }
  ],
- "search_fields": "terminal_id,terminal_name,current_employee,branch",
+ "search_fields": "terminal_id,current_employee,branch",
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": [],
- "title_field": "terminal_name"
+ "title_field": "terminal_id"
 }

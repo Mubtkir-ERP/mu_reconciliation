@@ -16,14 +16,15 @@ def execute(filters=None):
 def get_columns():
     return [
         {
-            "fieldname": "terminal_id",
-            "label": _("Terminal ID (TID)"),
-            "fieldtype": "Data",
-            "width": 140,
+            "fieldname": "terminal",
+            "label": _("Mada Terminal"),
+            "fieldtype": "Link",
+            "options": "Mada Terminal",
+            "width": 130,
         },
         {
-            "fieldname": "terminal_name",
-            "label": _("Terminal Name / Driver"),
+            "fieldname": "terminal_id",
+            "label": _("Terminal ID (TID)"),
             "fieldtype": "Data",
             "width": 160,
         },
@@ -98,8 +99,8 @@ def get_data(filters):
 
     query = f"""
         SELECT
+            r.terminal,
             r.terminal_id,
-            t.terminal_name,
             t.branch,
             r.settlement_date,
             r.batch_no,
@@ -151,8 +152,8 @@ def get_data(filters):
             status_str = _("Pending Bank Deposit 🔴")
 
         data.append({
+            "terminal": r.terminal,
             "terminal_id": r.terminal_id,
-            "terminal_name": r.terminal_name or r.terminal_id,
             "branch": r.branch,
             "settlement_date": r.settlement_date,
             "batch_no": r.batch_no,

@@ -14,6 +14,7 @@
   "employee",
   "transaction_count",
   "reconciliation_status",
+  "bank_reconciliation",
   "notes"
  ],
  "fields": [
@@ -83,6 +84,13 @@
    "fieldname": "notes",
    "fieldtype": "Data",
    "label": "Notes"
+  },
+  {
+   "fieldname": "bank_reconciliation",
+   "fieldtype": "Link",
+   "label": "Bank Reconciliation",
+   "options": "Mada Bank Reconciliation",
+   "read_only": 1
   }
  ],
  "istable": 1,
