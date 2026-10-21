@@ -1,6 +1,6 @@
 {
  "charts": [],
- "content": "[{\"id\": \"hdr1\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>مطابقة البنوك</b></span>\", \"col\": 12}}, {\"id\": \"sc1\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Mada Settlement Entry\", \"col\": 3}}, {\"id\": \"sc2\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Mada Bank Reconciliation\", \"col\": 3}}, {\"id\": \"sc3\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Mada Terminal\", \"col\": 3}}, {\"id\": \"sc4\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Mada Reconciliation Status\", \"col\": 3}}, {\"id\": \"sp1\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"hdr2\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>العمليات والتقارير</b></span>\", \"col\": 12}}, {\"id\": \"card1\", \"type\": \"card\", \"data\": {\"card_name\": \"الموازنات والأجهزة\", \"col\": 4}}, {\"id\": \"card2\", \"type\": \"card\", \"data\": {\"card_name\": \"مطابقة البنوك والتقارير\", \"col\": 4}}, {\"id\": \"card3\", \"type\": \"card\", \"data\": {\"card_name\": \"الإعدادات\", \"col\": 4}}]",
+ "content": "[{\"id\": \"hdr1\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Bank Reconciliation</b></span>\", \"col\": 12}}, {\"id\": \"sc1\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Mada Settlement Entry\", \"col\": 3}}, {\"id\": \"sc2\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Mada Bank Reconciliation\", \"col\": 3}}, {\"id\": \"sc3\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Mada Terminal\", \"col\": 3}}, {\"id\": \"sc4\", \"type\": \"shortcut\", \"data\": {\"shortcut_name\": \"Mada Reconciliation Status\", \"col\": 3}}, {\"id\": \"sp1\", \"type\": \"spacer\", \"data\": {\"col\": 12}}, {\"id\": \"hdr2\", \"type\": \"header\", \"data\": {\"text\": \"<span class=\\\"h4\\\"><b>Operations &amp; Reports</b></span>\", \"col\": 12}}, {\"id\": \"card1\", \"type\": \"card\", \"data\": {\"card_name\": \"Settlements &amp; Terminals\", \"col\": 4}}, {\"id\": \"card2\", \"type\": \"card\", \"data\": {\"card_name\": \"Bank Reconciliation &amp; Reports\", \"col\": 4}}, {\"id\": \"card3\", \"type\": \"card\", \"data\": {\"card_name\": \"Settings\", \"col\": 4}}]",
  "creation": "2026-10-19 21:00:00.000000",
  "custom_blocks": [],
  "docstatus": 0,
@@ -15,7 +15,7 @@
   {
    "hidden": 0,
    "is_query_report": 0,
-   "label": "الموازنات والأجهزة",
+   "label": "Settlements & Terminals",
    "link_count": 2,
    "link_type": "DocType",
    "onboard": 0,
@@ -24,7 +24,7 @@
   {
    "hidden": 0,
    "is_query_report": 0,
-   "label": "تسجيل موازنة أجهزة مدى",
+   "label": "Mada Settlement Entry",
    "link_count": 0,
    "link_to": "Mada Settlement Entry",
    "link_type": "DocType",
@@ -34,7 +34,7 @@
   {
    "hidden": 0,
    "is_query_report": 0,
-   "label": "أجهزة مدى",
+   "label": "Mada Terminal",
    "link_count": 0,
    "link_to": "Mada Terminal",
    "link_type": "DocType",
@@ -44,7 +44,7 @@
   {
    "hidden": 0,
    "is_query_report": 0,
-   "label": "مطابقة البنوك والتقارير",
+   "label": "Bank Reconciliation & Reports",
    "link_count": 2,
    "link_type": "DocType",
    "onboard": 0,
@@ -53,7 +53,7 @@
   {
    "hidden": 0,
    "is_query_report": 0,
-   "label": "مطابقة كشف الحساب البنكي لمدى",
+   "label": "Mada Bank Reconciliation",
    "link_count": 0,
    "link_to": "Mada Bank Reconciliation",
    "link_type": "DocType",
@@ -63,7 +63,7 @@
   {
    "hidden": 0,
    "is_query_report": 1,
-   "label": "تقرير حالة مطابقة مدى",
+   "label": "Mada Reconciliation Status",
    "link_count": 0,
    "link_to": "Mada Reconciliation Status",
    "link_type": "Report",
@@ -73,7 +73,7 @@
   {
    "hidden": 0,
    "is_query_report": 0,
-   "label": "الإعدادات",
+   "label": "Settings",
    "link_count": 1,
    "link_type": "DocType",
    "onboard": 0,
@@ -82,7 +82,7 @@
   {
    "hidden": 0,
    "is_query_report": 0,
-   "label": "إعدادات مطابقة مدى",
+   "label": "Mada Reconciliation Settings",
    "link_count": 0,
    "link_to": "Mada Reconciliation Settings",
    "link_type": "DocType",
@@ -90,7 +90,7 @@
    "type": "Link"
   }
  ],
- "modified": "2026-10-21 14:00:00.000000",
+ "modified": "2026-10-21 15:00:00.000000",
  "modified_by": "Administrator",
  "module": "Mu Reconciliation",
  "name": "Bank Reconciliation",
@@ -114,7 +114,7 @@
   {
    "color": "Blue",
    "doc_view": "List",
-   "label": "تسجيل موازنة أجهزة مدى",
+   "label": "Mada Settlement Entry",
    "link_to": "Mada Settlement Entry",
    "stats_filter": "[]",
    "type": "DocType"
@@ -122,7 +122,7 @@
   {
    "color": "Green",
    "doc_view": "List",
-   "label": "مطابقة كشف الحساب البنكي لمدى",
+   "label": "Mada Bank Reconciliation",
    "link_to": "Mada Bank Reconciliation",
    "stats_filter": "[]",
    "type": "DocType"
@@ -130,7 +130,7 @@
   {
    "color": "Grey",
    "doc_view": "List",
-   "label": "أجهزة مدى",
+   "label": "Mada Terminal",
    "link_to": "Mada Terminal",
    "stats_filter": "[]",
    "type": "DocType"
@@ -138,7 +138,7 @@
   {
    "color": "Orange",
    "doc_view": "",
-   "label": "تقرير حالة مطابقة مدى",
+   "label": "Mada Reconciliation Status",
    "link_to": "Mada Reconciliation Status",
    "stats_filter": "[]",
    "type": "Report"

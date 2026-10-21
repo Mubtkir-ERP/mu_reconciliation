@@ -29,7 +29,7 @@
    "default": "M-.####",
    "fieldname": "naming_series",
    "fieldtype": "Select",
-   "label": "سلسلة الترقيم",
+   "label": "Naming Series",
    "options": "M-.####",
    "reqd": 1
   },
@@ -37,23 +37,23 @@
    "fieldname": "terminal_id",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "رقم الجهاز (TID)",
+   "label": "Terminal ID (TID)",
    "reqd": 1,
    "unique": 1,
-   "description": "رقم الجهاز 8 أرقام المطبوع على الإيصال أو كشف الحساب"
+   "description": "8-digit MADA Terminal identifier as printed on receipt/bank statement (e.g. 15691146)"
   },
   {
    "fieldname": "terminal_name",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "اسم الجهاز"
+   "label": "Terminal Name"
   },
   {
    "default": "Active",
    "fieldname": "status",
    "fieldtype": "Select",
    "in_list_view": 1,
-   "label": "الحالة",
+   "label": "Status",
    "options": "Active\nInactive\nUnder Maintenance"
   },
   {
@@ -64,37 +64,37 @@
    "fieldname": "branch",
    "fieldtype": "Link",
    "in_list_view": 1,
-   "label": "الفرع",
+   "label": "Branch",
    "options": "Branch"
   },
   {
    "fieldname": "company",
    "fieldtype": "Link",
-   "label": "الشركة",
+   "label": "Company",
    "options": "Company"
   },
   {
    "fieldname": "bank_account",
    "fieldtype": "Link",
-   "label": "الحساب البنكي المرتبط",
+   "label": "Associated Bank Account",
    "options": "Bank Account"
   },
   {
    "fieldname": "section_break_8",
    "fieldtype": "Section Break",
-   "label": "العهدة والتسليم الحالي"
+   "label": "Current Custody / Assignment"
   },
   {
    "fieldname": "current_employee",
    "fieldtype": "Link",
    "in_list_view": 1,
-   "label": "السائق / الموظف الحالي",
+   "label": "Current Driver / Employee",
    "options": "Employee"
   },
   {
    "fieldname": "current_user",
    "fieldtype": "Link",
-   "label": "مستخدم النظام الحالي",
+   "label": "Current System User",
    "options": "User"
   },
   {
@@ -104,22 +104,22 @@
   {
    "fieldname": "serial_no",
    "fieldtype": "Data",
-   "label": "الرقم التسلسلي"
+   "label": "Serial No"
   },
   {
    "fieldname": "model",
    "fieldtype": "Data",
-   "label": "الموديل / نوع الجهاز"
+   "label": "Model / Device Type"
   },
   {
    "fieldname": "section_break_14",
    "fieldtype": "Section Break",
-   "label": "سجل حركة عهدة الجهاز"
+   "label": "Terminal Custody History"
   },
   {
    "fieldname": "assignment_history",
    "fieldtype": "Table",
-   "label": "سجل التسليم والعهدة",
+   "label": "Assignment History",
    "options": "Mada Terminal Assignment"
   }
  ],

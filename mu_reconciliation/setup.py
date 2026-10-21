@@ -1,9 +1,16 @@
 # -*- coding: utf-8 -*-
+import csv
+import os
 import frappe
 
 
 def after_migrate():
-    """Cleanup legacy workspaces, ensure Bank Reconciliation workspace is clean, and enforce naming series."""
+    """
+    1. Cleanup legacy workspaces
+    2. Ensure Bank Reconciliation workspace is clean with English label/title (translated via ar.csv/tabTranslation)
+    3. Update naming series in tabDocField
+    4. Sync translations into tabTranslation for language 'ar'
+    """
     try:
         # 1. Update naming series in tabDocField directly
         frappe.db.sql("""
@@ -32,7 +39,7 @@ def after_migrate():
         # 3. Clean up legacy workspaces permanently
         old_workspaces = [
             "Mada Reconciliation", "mada_reconciliation", "مطابقة مدى",
-            "Mu Reconciliation", "mu_reconciliation", "mu-reconciliation"
+            "Mu Reconciliation", "mu_reconciliation", "mu-reconciliation", "مطابقة البنوك"
         ]
         for name in old_workspaces:
             frappe.db.sql("DELETE FROM `tabWorkspace` WHERE name=%s OR label=%s OR title=%s", (name, name, name))
@@ -41,12 +48,29 @@ def after_migrate():
             "DELETE FROM `tabWorkspace` WHERE module='Mu Reconciliation' AND name != 'Bank Reconciliation'"
         )
 
-        # 4. Ensure Bank Reconciliation workspace exists and has clean Arabic label
+        # 4. Ensure Bank Reconciliation workspace has standard English name/label/title
         frappe.db.sql("""
             UPDATE `tabWorkspace` 
-            SET label='مطابقة البنوك', title='مطابقة البنوك' 
+            SET label='Bank Reconciliation', title='Bank Reconciliation' 
             WHERE name='Bank Reconciliation'
         """)
+
+        # 5. Populate/Sync tabTranslation for Arabic
+        csv_path = os.path.join(os.path.dirname(__file__), "translations", "ar.csv")
+        if os.path.exists(csv_path):
+            with open(csv_path, "r", encoding="utf-8") as f:
+                reader = csv.reader(f)
+                for row in reader:
+                    if len(row) >= 2 and row[0].strip() and row[1].strip():
+                        src = row[0].strip()
+                        dst = row[1].strip()
+                        # Use frappe Translation doctype or direct SQL
+                        frappe.db.sql("""
+                            INSERT INTO `tabTranslation` (`name`, `language`, `source_text`, `translated_text`, `docstatus`)
+                            VALUES (%s, 'ar', %s, %s, 0)
+                            ON DUPLICATE KEY UPDATE `translated_text` = %s
+                        """, (f"ar:{src}"[:140], src, dst, dst))
+
         frappe.db.commit()
     except Exception:
         pass
