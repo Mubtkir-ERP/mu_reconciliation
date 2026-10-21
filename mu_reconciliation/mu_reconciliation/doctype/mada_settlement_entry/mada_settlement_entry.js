@@ -4,16 +4,16 @@
 frappe.ui.form.on("Mada Settlement Entry", {
     refresh(frm) {
         if (frm.doc.docstatus === 0) {
-            frm.add_custom_button(__("جلب أجهزة الفرع تلقائياً"), () => {
-                if (!frm.doc.branch) {
-                    frappe.msgprint(__("يرجى اختيار الفرع أولاً"));
-                    return;
+            frm.add_custom_button(__("جلب أجهزة مدى النشطة"), () => {
+                let filters = { status: "Active" };
+                if (frm.doc.branch) {
+                    filters.branch = frm.doc.branch;
                 }
                 frappe.call({
                     method: "frappe.client.get_list",
                     args: {
                         doctype: "Mada Terminal",
-                        filters: { branch: frm.doc.branch, status: "Active" },
+                        filters: filters,
                         fields: ["name", "terminal_id", "current_employee"]
                     },
                     callback: function(r) {
@@ -29,9 +29,9 @@ frappe.ui.form.on("Mada Settlement Entry", {
                                 }
                             });
                             frm.refresh_field("settlement_rows");
-                            frappe.show_alert({ message: __("تم إضافة أجهزة الفرع بنجاح"), indicator: "green" });
+                            frappe.show_alert({ message: __("تم إضافة أجهزة مدى بنجاح"), indicator: "green" });
                         } else {
-                            frappe.msgprint(__("لا توجد أجهزة نشطة مربوطة بهذا الفرع"));
+                            frappe.msgprint(__("لا توجد أجهزة مدى نشطة مسجلة"));
                         }
                     }
                 });

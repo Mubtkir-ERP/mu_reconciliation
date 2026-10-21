@@ -16,7 +16,7 @@
    "hidden": 0,
    "is_query_report": 0,
    "label": "Settlements & Terminals",
-   "link_count": 3,
+   "link_count": 2,
    "link_type": "DocType",
    "onboard": 0,
    "type": "Card Break"
@@ -37,16 +37,6 @@
    "label": "Mada Terminal",
    "link_count": 0,
    "link_to": "Mada Terminal",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Mada Terminal Assignment",
-   "link_count": 0,
-   "link_to": "Mada Terminal Assignment",
    "link_type": "DocType",
    "onboard": 0,
    "type": "Link"

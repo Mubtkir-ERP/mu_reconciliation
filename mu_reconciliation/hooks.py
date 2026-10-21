@@ -3,12 +3,14 @@
 # For license information, please see license.txt
 
 app_name = "mu_reconciliation"
-app_title = "MU Reconciliation"
+app_title = "مطابقة البنوك"
 app_publisher = "Mubtkir"
 app_description = "نظام مطابقة مبيعات شبكة مدى وموازنات الأجهزة مع كشوف الحسابات البنكية"
 app_email = "info@mubtkir.com"
 app_license = "mit"
 required_apps = ["erpnext"]
+
+after_migrate = "mu_reconciliation.setup.after_migrate"
 
 # Includes in <head>
 # ------------------

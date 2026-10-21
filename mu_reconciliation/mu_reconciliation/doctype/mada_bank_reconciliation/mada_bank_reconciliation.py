@@ -54,10 +54,15 @@ class MadaBankReconciliation(Document):
 
         self.set("statement_rows", [])
         added = 0
+        total_in_file = len(records)
+        dates_in_file = []
+
         for rec in records:
             if rec.get("credit", 0) > 0 or rec.get("commission", 0) > 0:
                 rec_date_str = rec.get("date")
                 rec_date = getdate(rec_date_str) if rec_date_str else None
+                if rec_date:
+                    dates_in_file.append(rec_date)
 
                 # Filter by date range if transaction date was detected
                 if from_d and rec_date and rec_date < from_d:
@@ -76,11 +81,22 @@ class MadaBankReconciliation(Document):
                 })
                 added += 1
 
+        if added == 0 and total_in_file > 0 and (from_d or to_d):
+            min_d = str(min(dates_in_file)) if dates_in_file else _("Unknown")
+            max_d = str(max(dates_in_file)) if dates_in_file else _("Unknown")
+            frappe.msgprint(
+                _("Found {0} transactions in statement, but none match the period {1} to {2}. File transactions date range: {3} to {4}").format(
+                    total_in_file, self.from_date, self.to_date, min_d, max_d
+                ),
+                title=_("Date Range Warning"),
+                indicator="orange"
+            )
+
         self.status = "Parsed"
         self.calculate_summary()
         self.save()
         frappe.db.commit()
-        return {"status": "success", "rows_added": added}
+        return {"status": "success", "rows_added": added, "total_in_file": total_in_file}
 
     @frappe.whitelist()
     def run_reconciliation(self):
