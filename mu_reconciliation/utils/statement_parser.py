@@ -25,11 +25,18 @@ def clean_number(val):
 
 
 def parse_date_str(val):
-    """Parse various bank date formats into standard YYYY-MM-DD."""
+    """
+    Parse various bank date formats into standard YYYY-MM-DD.
+    Strictly accepts Gregorian dates (2000 <= year <= 2099) and rejects Hijri years (e.g. 1448).
+    Supports DD/MM/YYYY, MM/DD/YYYY, and YYYY-MM-DD.
+    """
     if not val:
         return None
     if isinstance(val, (datetime,)):
-        return val.strftime("%Y-%m-%d")
+        if 2000 <= val.year <= 2099:
+            return val.strftime("%Y-%m-%d")
+        return None
+
     s = str(val).translate(ARABIC_DIGITS).strip()
     if not s:
         return None
@@ -38,28 +45,47 @@ def parse_date_str(val):
     if not any(sep in s for sep in ("-", "/", ".")):
         return None
 
-    # Standard date formats
-    for fmt in ("%Y-%m-%d", "%d/%m/%Y", "%m/%d/%Y", "%d-%m-%Y", "%Y/%m/%d", "%d.%m.%Y", "%Y.%m.%d"):
+    # Standard formats
+    for fmt in ("%Y-%m-%d", "%Y/%m/%d", "%Y.%m.%d", "%d/%m/%Y", "%m/%d/%Y", "%d-%m-%Y", "%m-%d-%Y", "%d.%m.%Y"):
         try:
-            return datetime.strptime(s, fmt).strftime("%Y-%m-%d")
+            dt = datetime.strptime(s, fmt)
+            if 2000 <= dt.year <= 2099:
+                return dt.strftime("%Y-%m-%d")
         except ValueError:
             pass
 
-    # Regex search for YYYY-MM-DD or YYYY/MM/DD or YYYY.MM.DD inside text
-    m = re.search(r"\b(202\d)[-/.](\d{1,2})[-/.](\d{1,2})\b", s)
+    # Regex search for YYYY-MM-DD or YYYY/MM/DD or YYYY.MM.DD
+    m = re.search(r"\b(20[2-9]\d)[-/.](\d{1,2})[-/.](\d{1,2})\b", s)
     if m:
         try:
-            return f"{m.group(1)}-{int(m.group(2)):02d}-{int(m.group(3)):02d}"
+            dt = datetime(int(m.group(1)), int(m.group(2)), int(m.group(3)))
+            if 2000 <= dt.year <= 2099:
+                return dt.strftime("%Y-%m-%d")
         except Exception:
             pass
 
-    # Regex search for DD/MM/YYYY or DD-MM-YYYY or DD.MM.YYYY
-    m = re.search(r"\b(\d{1,2})[-/.](\d{1,2})[-/.](202\d)\b", s)
+    # Regex search for DD/MM/YYYY or MM/DD/YYYY
+    m = re.search(r"\b(\d{1,2})[-/.](\d{1,2})[-/.](20[2-9]\d)\b", s)
     if m:
-        try:
-            return f"{m.group(3)}-{int(m.group(2)):02d}-{int(m.group(1)):02d}"
-        except Exception:
-            pass
+        p1, p2, yr = int(m.group(1)), int(m.group(2)), int(m.group(3))
+        # If p1 > 12, then p1 must be day, p2 is month (DD/MM/YYYY)
+        if p1 > 12 and 1 <= p2 <= 12:
+            try:
+                return datetime(yr, p2, p1).strftime("%Y-%m-%d")
+            except Exception:
+                pass
+        # If p2 > 12, then p2 must be day, p1 is month (MM/DD/YYYY)
+        elif p2 > 12 and 1 <= p1 <= 12:
+            try:
+                return datetime(yr, p1, p2).strftime("%Y-%m-%d")
+            except Exception:
+                pass
+        else:
+            # Both <= 12: try DD/MM/YYYY first, valid Gregorian
+            try:
+                return datetime(yr, p2, p1).strftime("%Y-%m-%d")
+            except Exception:
+                pass
 
     return None
 
@@ -171,7 +197,7 @@ def parse_pdf(file_path):
 def parse_text_stream(file_path):
     with open(file_path, "rb") as f:
         content = f.read()
-    strings = re.findall(rb"[\x20-\x7E\xA0-\xFF]{4,}", content)
+    strings = re.findall(b"[\\x20-\\x7E\\xA0-\\xFF]{4,}", content)
     lines = [s.decode("latin1", errors="ignore") for s in strings]
     return parse_text_lines(lines)
 
@@ -205,7 +231,7 @@ def extract_mada_records_from_table(rows):
 
         is_commission = "commission" in row_str.lower() or "عمولة" in row_str
 
-        # Search for date in row cells first
+        # Search for valid Gregorian date in row cells first (ignores Hijri dates like 1448-xx-xx)
         txn_date = None
         for cell in row:
             d = parse_date_str(cell)
@@ -215,11 +241,11 @@ def extract_mada_records_from_table(rows):
 
         # Fallback date search in entire row_str
         if not txn_date:
-            date_m = re.search(r"\b(202\d[-/.]\d{1,2}[-/.]\d{1,2})\b", row_str)
+            date_m = re.search(r"\b(20[2-9]\d[-/.]\d{1,2}[-/.]\d{1,2})\b", row_str)
             if date_m:
                 txn_date = parse_date_str(date_m.group(1))
             if not txn_date:
-                date_m2 = re.search(r"\b(\d{1,2}[-/.]\d{1,2}[-/.]202\d)\b", row_str)
+                date_m2 = re.search(r"\b(\d{1,2}[-/.]\d{1,2}[-/.]20[2-9]\d)\b", row_str)
                 if date_m2:
                     txn_date = parse_date_str(date_m2.group(1))
 
@@ -229,17 +255,15 @@ def extract_mada_records_from_table(rows):
         if batch_match:
             batch_no = batch_match.group(1)
 
-        # Extract amounts: find numbers in cells
-        amounts = []
+        # Extract amounts from row
+        numbers = []
         for cell in row:
-            val = clean_number(cell)
-            if val != 0.0:
-                amounts.append(abs(val))
+            val_clean = clean_number(cell)
+            if val_clean != 0:
+                numbers.append(val_clean)
 
-        # Amount is typically in the last numeric columns
-        amount = amounts[-1] if amounts else 0.0
+        key = f"{tid}_{batch_no}_{txn_date}" if batch_no else f"{tid}_{txn_date}_{len(batch_map)}"
 
-        key = (tid, txn_date, batch_no or "ALL")
         if key not in batch_map:
             batch_map[key] = {
                 "terminal_id": tid,
@@ -247,19 +271,21 @@ def extract_mada_records_from_table(rows):
                 "batch_no": batch_no,
                 "credit": 0.0,
                 "commission": 0.0,
-                "description": row_str[:120]
+                "description": row_str[:250]
             }
 
-        if is_commission:
-            batch_map[key]["commission"] = amount
-        else:
-            if amount > 0:
-                batch_map[key]["credit"] = amount
+        for n in numbers:
+            if is_commission:
+                # Commissions are negative or debit amounts
+                batch_map[key]["commission"] = abs(n)
+            else:
+                # Deposits are positive amounts (exclude terminal IDs or batch numbers from amounts)
+                if abs(n) > 0.01 and n != float(tid) and (not batch_no or n != float(batch_no)):
+                    batch_map[key]["credit"] = abs(n)
 
     return list(batch_map.values())
 
 
 def parse_text_lines(lines):
-    """Parse unstructured text lines (from PDF or string extraction)."""
-    rows = [[line] for line in lines if line.strip()]
+    rows = [[col.strip() for col in line.split() if col.strip()] for line in lines]
     return extract_mada_records_from_table(rows)

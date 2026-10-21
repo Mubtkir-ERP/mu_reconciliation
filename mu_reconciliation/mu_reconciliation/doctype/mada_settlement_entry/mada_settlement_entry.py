@@ -9,6 +9,10 @@ from frappe.utils import flt, cint
 
 
 class MadaSettlementEntry(Document):
+    def before_insert(self):
+        if not self.naming_series or self.naming_series.startswith("MADA-SETT"):
+            self.naming_series = "MADA-.YY.-.MM.-.####"
+
     def validate(self):
         self.calculate_totals()
 

@@ -85,15 +85,15 @@ frappe.ui.form.on("Mada Bank Reconciliation", {
                 let banner = `
                     <div style="display:flex; gap:16px; padding:12px; background:#f8fafc; border-radius:8px; margin-bottom:15px; border:1px solid #e2e8f0;">
                         <div style="flex:1; border-left:4px solid #22c55e; padding-left:10px;">
-                            <div style="font-size:12px; color:#64748b;">Matched & Deposited in Bank 🟢</div>
+                            <div style="font-size:12px; color:#64748b;">${__("Matched & Deposited in Bank 🟢")}</div>
                             <div style="font-size:18px; font-weight:bold; color:#166534;">${matched}</div>
                         </div>
                         <div style="flex:1; border-left:4px solid #ef4444; padding-left:10px;">
-                            <div style="font-size:12px; color:#64748b;">Missing / Pending in Bank 🔴</div>
+                            <div style="font-size:12px; color:#64748b;">${__("Missing / Pending in Bank 🔴")}</div>
                             <div style="font-size:18px; font-weight:bold; color:#991b1b;">${missing}</div>
                         </div>
                         <div style="flex:1; border-left:4px solid #3b82f6; padding-left:10px;">
-                            <div style="font-size:12px; color:#64748b;">Bank Commissions Deducted 💳</div>
+                            <div style="font-size:12px; color:#64748b;">${__("Bank Commissions Deducted 💳")}</div>
                             <div style="font-size:18px; font-weight:bold; color:#1e40af;">${comm}</div>
                         </div>
                     </div>

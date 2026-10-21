@@ -9,6 +9,10 @@ from frappe.utils import now_datetime
 
 
 class MadaTerminal(Document):
+    def before_insert(self):
+        if not self.naming_series:
+            self.naming_series = "M-.####"
+
     def validate(self):
         if self.terminal_id:
             self.terminal_id = str(self.terminal_id).strip()

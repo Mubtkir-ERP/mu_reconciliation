@@ -114,20 +114,20 @@
    "fieldname": "total_matched_amount",
    "fieldtype": "Currency",
    "in_list_view": 1,
-   "label": "Total Matched Amount 🟢",
+   "label": "Total Matched Amount",
    "read_only": 1
   },
   {
    "fieldname": "total_missing_in_bank",
    "fieldtype": "Currency",
    "in_list_view": 1,
-   "label": "Missing / Pending in Bank 🔴",
+   "label": "Missing / Pending in Bank",
    "read_only": 1
   },
   {
    "fieldname": "total_unmatched_in_system",
    "fieldtype": "Currency",
-   "label": "Unmatched Deposits 🟡",
+   "label": "Unmatched Deposits",
    "read_only": 1
   },
   {

@@ -11,6 +11,7 @@ app_license = "mit"
 required_apps = ["erpnext"]
 
 after_migrate = "mu_reconciliation.setup.after_migrate"
+after_sync = "mu_reconciliation.setup.after_migrate"
 
 # Includes in <head>
 # ------------------

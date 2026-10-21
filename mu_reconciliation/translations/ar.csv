@@ -1,8 +1,11 @@
 Mu Reconciliation,مطابقة البنوك
 MU Reconciliation,مطابقة البنوك
 Bank Reconciliation,مطابقة البنوك
+Mada Reconciliation,مطابقة البنوك
 Mada Settlement Entry,تسجيل موازنة أجهزة مدى
+Mada Settlement Entry Row,تفاصيل موازنة أجهزة مدى
 Mada Bank Reconciliation,مطابقة كشف الحساب البنكي لمدى
+Mada Bank Statement Row,حركات كشف الحساب البنكي
 Mada Terminal,أجهزة مدى
 Mada Terminal Assignment,تعيين أجهزة مدى
 Mada Reconciliation Settings,إعدادات مطابقة مدى
@@ -13,14 +16,19 @@ Mada Reconciliation Status,تقرير حالة مطابقة مدى
 Statement Title,عنوان كشف المطابقة
 Bank Account,الحساب البنكي
 Bank Statement File,ملف كشف الحساب البنكي
-Bank Statement File (Excel, PDF, or CSV),ملف كشف الحساب البنكي (Excel أو PDF أو CSV)
-Supports .xlsx, .xls, .csv, .pdf,يدعم صيغ .xlsx, .xls, .csv, .pdf
+"Bank Statement File (Excel, PDF, or CSV)",ملف كشف الحساب البنكي (Excel أو PDF أو CSV)
+"Supports .xlsx, .xls, .csv, .pdf","يدعم صيغ .xlsx, .xls, .csv, .pdf"
 e.g. Al Rajhi Bank Reconciliation - Week 2 Oct 2026,مثال: مطابقة الأسبوع الثاني من أكتوبر - بنك الراجحي
 Total Bank Deposits,إجمالي إيداعات مدى في البنك
 Total Bank Commissions,إجمالي عمولات البنك
 Total Matched Amount,إجمالي المبالغ المطابقة
+Total Matched Amount 🟢,إجمالي المبالغ المطابقة 🟢
 Missing / Pending in Bank,المبالغ المعلقة / المفقودة من البنك
+Missing / Pending in Bank 🔴,المبالغ المعلقة / المفقودة من البنك 🔴
 Unmatched Deposits,إيداعات بنكية بدون موازنة
+Unmatched Deposits 🟡,إيداعات بنكية بدون موازنة 🟡
+Matched & Deposited in Bank 🟢,المطابق والمودع بالبنك 🟢
+Bank Commissions Deducted 💳,عمولات البنك المحسومة 💳
 Commission Journal Entry,سند قيد العمولة البنكية
 Statement Rows,حركات الكشف البنكي
 Transaction Date,تاريخ الحركة بالبنك
@@ -39,6 +47,7 @@ Reconciled with Bank 🟢,مطابق بالبنك 🟢
 Pending / Unreconciled 🔴,معلق / غير مودع 🔴
 Unmatched Deposit 🟡,إيداع بدون موازنة 🟡
 Matched 🟢,مطابق 🟢
+Variance / Discrepancy 🔴,عجز / زيادة 🔴
 Parsed,تمت قراءة الكشف
 Draft,مسودة
 Reconciled,تمت المطابقة
@@ -51,85 +60,51 @@ Reconciliation Summary & Totals,ملخص المبالغ والنتائج
 From Date,من تاريخ
 To Date,إلى تاريخ
 Status,الحالة
-Matched & Deposited in Bank 🟢,المطابق والمودع بالبنك 🟢
-Missing / Pending in Bank 🔴,المبالغ المعلقة / المفقودة من البنك 🔴
-Bank Commissions Deducted 💳,عمولات البنك المحسومة 💳
+Naming Series,سلسلة الترقيم
 No Data,لا توجد بيانات
 Reconciliation Result,نتيجة المطابقة
 Reconciliation completed! Matched: {0} | Pending in Bank: {1},اكتملت المطابقة! المطابق: {0} | المعلق في البنك: {1}
 Date Range Warning,تنبيه نطاق التواريخ
-Found {0} transactions in statement, but none match the period {1} to {2}. File transactions date range: {3} to {4},تم العثور على {0} حركة في الكشف، ولكن لا توجد حركات ضمن الفترة {1} إلى {2}. نطاق تواريخ الملف: {3} إلى {4}
-Extracted {0} MADA transaction(s) within selected date range.,تم استخراج {0} حركة لمدى ضمن الفترة المحددة.
-Please attach the bank statement file first (Excel, PDF, or CSV),يرجى إرفاق ملف كشف الحساب البنكي أولاً (Excel أو PDF أو CSV)
-Parsing bank statement and extracting MADA transactions...,جاري قراءة كشف الحساب البنكي واستخراج حركات مدى...
+"Found {0} transactions in statement, but none match the period {1} to {2}. File transactions date range: {3} to {4}",تم العثور على {0} حركة في الكشف ولكن لا توجد حركات تطابق الفترة من {1} إلى {2}. نطاق تواريخ الحركات في الملف: {3} إلى {4}
+Please fill the following mandatory fields before saving,يرجى تعبئة الحقول الإلزامية التالية قبل الحفظ
+Please fill the following mandatory fields before saving:,يرجى تعبئة الحقول الإلزامية التالية قبل الحفظ:
+"Please attach the bank statement file first (Excel, PDF, or CSV)",يرجى إرفاق ملف كشف الحساب البنكي أولاً (Excel أو PDF أو CSV)
+Parsing bank statement and extracting MADA transactions...,جاري قراءة كشف الحساب واستخراج حركات مدى...
+Extracted {0} MADA transaction(s) within selected date range.,تم استخراج {0} حركة لمدى ضمن الفترة المحددة بنجاح.
 Reconciling system settlements with bank statement deposits...,جاري مطابقة موازنات النظام مع إيداعات كشف الحساب البنكي...
+Are you sure you want to create and submit a Journal Entry for bank commissions of {0}?,هل أنت متأكد من إنشاء وترحيل قيد يومية لعمولات البنك بمبلغ {0}؟
 Creating and submitting Journal Entry...,جاري إنشاء وترحيل قيد اليومية...
 Journal Entry created successfully: {0},تم إنشاء قيد اليومية بنجاح: {0}
-Are you sure you want to create and submit a Journal Entry for bank commissions of {0}?,هل أنت متأكد من إنشاء وترحيل قيد يومية لعمولات البنك بمبلغ {0}؟
-Naming Series,الرقم التسلسلي
-Posting Date,تاريخ الترحيل
-Branch,الفرع
+Terminal Name,اسم الجهاز
 Branch / Location,الفرع / الموقع
 Company,الشركة
-Total Settlement Amount,إجمالي مبالغ الموازنة
-Total Transactions,إجمالي عدد العمليات
-Settlement Details,تفاصيل الموازنات
-Current Driver / Employee,السائق / الموظف الحالي
-Current System User,المستخدم الحالي
-Current Custody / Assignment,العهدة / التعيين الحالي
 Associated Bank Account,الحساب البنكي المرتبط
-Terminal Name,اسم الجهاز
-Serial No,الرقم التسلسلي للجهاز
-Model,الموديل
+Current Custody / Assignment,العهدة والتسليم الحالي
+Current Driver / Employee,السائق / الموظف الحالي
+Current System User,مستخدم النظام الحالي
+Serial No,الرقم التسلسلي
 Model / Device Type,الموديل / نوع الجهاز
-Terminal Custody History,سجل عهدة الجهاز
-Assignment History,سجل التعيين
-Assigned Driver / Employee,السائق / الموظف المستلم
-Assigned System User,مستخدم النظام المستلم
-Assignment Date & Time,تاريخ ووقت الاستلام
-Return Date & Time,تاريخ ووقت الإرجاع
-Reason / Note,السبب / ملاحظة
+Terminal Custody History,سجل حركة عهدة الجهاز
+Assignment History,سجل التسليم والعهدة
+Transaction Count,عدد العمليات
+Bank Reconciliation Status,حالة المطابقة البنكية
 Notes,ملاحظات
+Branch,الفرع
+Total Settlement Amount,إجمالي مبالغ الموازنات
+Settlement Rows,تفاصيل أجهزة مدى
+Operations & Reports,العمليات والتقارير
 Settlements & Terminals,الموازنات والأجهزة
 Bank Reconciliation & Reports,مطابقة البنوك والتقارير
 Settings,الإعدادات
-Operations & Reports,العمليات والتقارير
-جلب أجهزة مدى النشطة,جلب أجهزة مدى النشطة
-تم إضافة أجهزة مدى بنجاح,تم إضافة أجهزة مدى بنجاح
-لا توجد أجهزة مدى نشطة مسجلة,لا توجد أجهزة مدى نشطة مسجلة
-يرجى اختيار الفرع أولاً,يرجى اختيار الفرع أولاً
-تسليم جهاز لسائق / موظف,تسليم جهاز لسائق / موظف
-Default Bank Account,الحساب البنكي الافتراضي
-Commission Expense Account,حساب مصروف عمولة مدى
-Commission VAT Account,حساب ضريبة عمولة مدى
-VAT Rate on Commission (%),نسبة الضريبة على العمولة (%)
-Tolerance Amount,مبلغ السماحية
-Date Tolerance (Days),فارق الأيام المسموح به
-Auto Match by TID,مطابقة تلقائية برقم الجهاز
-Auto Match by Batch No,مطابقة تلقائية برقم الموازنة
-Auto Create Commission Entry,إنشاء قيد العمولة تلقائياً
-MADA Reconciliation Rules,قواعد مطابقة مدى
-Accounting Settings,الإعدادات المحاسبية
-Automations,الأتمتة
-General,عام
-Transaction Count,عدد العمليات
-Bank Reconciliation Status,حالة المطابقة البنكية
-Variance / Discrepancy 🔴,عجز / زيادة 🔴
-معلق / في الانتظار,معلق / في الانتظار
-مطابق بالبنك 🟢,مطابق بالبنك 🟢
-عجز / زيادة 🔴,عجز / زيادة 🔴
 8-digit MADA Terminal identifier as printed on receipt/bank statement (e.g. 15691146),رقم الجهاز 8 أرقام المطبوع على الإيصال أو كشف الحساب
-Mada Reconciliation Dashboard,لوحة متابعة مطابقة مدى
-Reconciliation Summary,ملخص المطابقة
-Matched Total,إجمالي المطابق
-Missing in Bank,المعلق في البنك
-Commissions Total,إجمالي العمولات
-Matched Details,تفاصيل المطابقة
-Unmatched Details,تفاصيل المعلق
-All Terminals,جميع الأجهزة
-Filter by Date,تصفية بالتاريخ
+Select Branch,اختر الفرع
 Select Bank Account,اختر الحساب البنكي
-Select Period,اختر الفترة
-Clear,مسح
-Reload File,إعادة تحميل الملف
-No MADA transactions found in the attached file. Please verify the file format.,لم يتم العثور على حركات مدى في الملف المرفق. يرجى التحقق من الملف.
+Select Date,اختر التاريخ
+All Terminals,جميع الأجهزة
+Fetch Active Terminals,جلب أجهزة مدى النشطة
+No MADA transactions found in the attached file. Please verify the file format.,لم يتم العثور على حركات مدى في الملف المرفق. يرجى التحقق من صحة الملف.
+Bank Statement File is required to parse transactions.,يرجى إرفاق ملف كشف الحساب البنكي لقراءة الحركات.
+Reconciliation has already been submitted.,تم اعتماد المطابقة مسبقاً.
+Only reconciled statements can generate commission entries.,يمكن فقط للمطابقات المكتملة إنشاء قيد العمولة البنكية.
+Bank Commission expense account not configured in Mada Reconciliation Settings.,لم يتم تحديد حساب مصروف عمولة البنك في إعدادات مطابقة مدى.
+Bank commission Journal Entry already created.,تم إنشاء قيد عمولة البنك مسبقاً.

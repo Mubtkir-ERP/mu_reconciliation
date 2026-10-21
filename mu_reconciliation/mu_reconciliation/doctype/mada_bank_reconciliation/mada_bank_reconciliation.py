@@ -10,6 +10,10 @@ from mu_reconciliation.utils.statement_parser import parse_bank_file
 
 
 class MadaBankReconciliation(Document):
+    def before_insert(self):
+        if not self.naming_series or self.naming_series.startswith("MADA-RECON"):
+            self.naming_series = "BR-.YY.-.#####"
+
     def validate(self):
         self.calculate_summary()
 
@@ -81,7 +85,21 @@ class MadaBankReconciliation(Document):
                 })
                 added += 1
 
-        if added == 0 and total_in_file > 0 and (from_d or to_d):
+        if added == 0 and total_in_file > 0:
+            for rec in records:
+                if rec.get("credit", 0) > 0 or rec.get("commission", 0) > 0:
+                    rec_date_str = rec.get("date")
+                    self.append("statement_rows", {
+                        "txn_date": rec_date_str or self.from_date or nowdate(),
+                        "terminal_id": rec.get("terminal_id") or "",
+                        "batch_no": rec.get("batch_no") or "",
+                        "credit_amount": rec.get("credit", 0.0),
+                        "commission_amount": rec.get("commission", 0.0),
+                        "description": rec.get("description") or "",
+                        "matched_status": "Pending / Unreconciled 🔴"
+                    })
+                    added += 1
+
             min_d = str(min(dates_in_file)) if dates_in_file else _("Unknown")
             max_d = str(max(dates_in_file)) if dates_in_file else _("Unknown")
             frappe.msgprint(
