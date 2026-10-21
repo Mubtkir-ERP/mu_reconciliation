@@ -2,6 +2,12 @@
 // For license information, please see license.txt
 
 frappe.ui.form.on("Mada Bank Reconciliation", {
+    onload(frm) {
+        frm.set_df_property("naming_series", "options", ["BR-.YY.-.#####"]);
+        if (frm.is_new() && (!frm.doc.naming_series || frm.doc.naming_series.includes("MADA-RECON"))) {
+            frm.set_value("naming_series", "BR-.YY.-.#####");
+        }
+    },
     refresh(frm) {
         if (!frm.is_new()) {
             // Button 1: Parse Statement

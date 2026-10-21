@@ -21,7 +21,7 @@
    "fieldname": "terminal",
    "fieldtype": "Link",
    "in_list_view": 1,
-   "label": "Mada Terminal",
+   "label": "أجهزة مدى",
    "options": "Mada Terminal",
    "reqd": 1
   },
@@ -30,28 +30,28 @@
    "fieldname": "terminal_id",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "Terminal ID (TID)",
+   "label": "رقم الجهاز (TID)",
    "read_only": 1
   },
   {
    "fieldname": "batch_no",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "Batch No"
+   "label": "رقم الموازنة (Batch No)"
   },
   {
    "default": "Today",
    "fieldname": "settlement_date",
    "fieldtype": "Date",
    "in_list_view": 1,
-   "label": "Settlement Date",
+   "label": "تاريخ الموازنة",
    "reqd": 1
   },
   {
    "fieldname": "amount",
    "fieldtype": "Currency",
    "in_list_view": 1,
-   "label": "Settlement Amount",
+   "label": "مبلغ الموازنة",
    "reqd": 1
   },
   {
@@ -63,26 +63,26 @@
    "fieldname": "employee",
    "fieldtype": "Link",
    "in_list_view": 1,
-   "label": "Driver / Employee",
+   "label": "السائق / الموظف",
    "options": "Employee"
   },
   {
    "fieldname": "transaction_count",
    "fieldtype": "Int",
-   "label": "Transaction Count"
+   "label": "عدد العمليات"
   },
   {
    "default": "Pending / Unreconciled 🔴",
    "fieldname": "reconciliation_status",
    "fieldtype": "Select",
    "in_list_view": 1,
-   "label": "Bank Reconciliation Status",
+   "label": "حالة المطابقة البنكية",
    "options": "Pending / Unreconciled 🔴\nReconciled with Bank 🟢\nVariance / Discrepancy 🔴\nمعلق / في الانتظار\nمطابق بالبنك 🟢\nعجز / زيادة 🔴"
   },
   {
    "fieldname": "notes",
    "fieldtype": "Data",
-   "label": "Notes"
+   "label": "ملاحظات"
   }
  ],
  "istable": 1,

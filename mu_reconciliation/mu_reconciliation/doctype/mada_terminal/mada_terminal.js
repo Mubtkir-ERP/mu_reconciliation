@@ -2,6 +2,12 @@
 // For license information, please see license.txt
 
 frappe.ui.form.on("Mada Terminal", {
+    onload(frm) {
+        frm.set_df_property("naming_series", "options", ["M-.####"]);
+        if (frm.is_new() && !frm.doc.naming_series) {
+            frm.set_value("naming_series", "M-.####");
+        }
+    },
     refresh(frm) {
         if (!frm.is_new()) {
             frm.add_custom_button(__("تسليم جهاز لسائق / موظف"), () => {

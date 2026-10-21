@@ -18,13 +18,13 @@
    "fieldname": "assigned_employee",
    "fieldtype": "Link",
    "in_list_view": 1,
-   "label": "Assigned Driver / Employee",
+   "label": "السائق / الموظف المستلم",
    "options": "Employee"
   },
   {
    "fieldname": "assigned_user",
    "fieldtype": "Link",
-   "label": "Assigned System User",
+   "label": "مستخدم النظام",
    "options": "User"
   },
   {
@@ -32,7 +32,7 @@
    "fieldname": "assigned_date",
    "fieldtype": "Datetime",
    "in_list_view": 1,
-   "label": "Assignment Date & Time",
+   "label": "تاريخ ووقت التسليم",
    "reqd": 1
   },
   {
@@ -43,18 +43,18 @@
    "fieldname": "returned_date",
    "fieldtype": "Datetime",
    "in_list_view": 1,
-   "label": "Return Date & Time"
+   "label": "تاريخ ووقت الإرجاع"
   },
   {
    "fieldname": "reason",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "Reason / Note"
+   "label": "سبب التسليم / ملاحظة"
   },
   {
    "fieldname": "notes",
    "fieldtype": "Small Text",
-   "label": "Notes"
+   "label": "ملاحظات"
   }
  ],
  "istable": 1,

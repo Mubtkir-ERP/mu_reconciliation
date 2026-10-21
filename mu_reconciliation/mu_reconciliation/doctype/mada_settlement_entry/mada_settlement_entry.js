@@ -2,6 +2,12 @@
 // For license information, please see license.txt
 
 frappe.ui.form.on("Mada Settlement Entry", {
+    onload(frm) {
+        frm.set_df_property("naming_series", "options", ["MADA-.YY.-.MM.-.####"]);
+        if (frm.is_new() && (!frm.doc.naming_series || frm.doc.naming_series.includes("MADA-SETT"))) {
+            frm.set_value("naming_series", "MADA-.YY.-.MM.-.####");
+        }
+    },
     refresh(frm) {
         if (frm.doc.docstatus === 0) {
             frm.add_custom_button(__("جلب أجهزة مدى النشطة"), () => {

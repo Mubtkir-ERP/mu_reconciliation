@@ -24,7 +24,7 @@
    "default": "MADA-.YY.-.MM.-.####",
    "fieldname": "naming_series",
    "fieldtype": "Select",
-   "label": "Naming Series",
+   "label": "سلسلة الترقيم",
    "options": "MADA-.YY.-.MM.-.####",
    "reqd": 1
   },
@@ -33,14 +33,14 @@
    "fieldname": "entry_date",
    "fieldtype": "Date",
    "in_list_view": 1,
-   "label": "Posting Date",
+   "label": "تاريخ الترحيل",
    "reqd": 1
   },
   {
    "fieldname": "branch",
    "fieldtype": "Link",
    "in_list_view": 1,
-   "label": "Branch",
+   "label": "الفرع",
    "options": "Branch"
   },
   {
@@ -50,31 +50,31 @@
   {
    "fieldname": "company",
    "fieldtype": "Link",
-   "label": "Company",
+   "label": "الشركة",
    "options": "Company"
   },
   {
    "fieldname": "total_settlement_amount",
    "fieldtype": "Currency",
    "in_list_view": 1,
-   "label": "Total Settlement Amount",
+   "label": "إجمالي مبالغ الموازنات",
    "read_only": 1
   },
   {
    "fieldname": "total_transactions",
    "fieldtype": "Int",
-   "label": "Total Transactions",
+   "label": "إجمالي عدد العمليات",
    "read_only": 1
   },
   {
    "fieldname": "section_break_8",
    "fieldtype": "Section Break",
-   "label": "MADA Terminal Settlement Details"
+   "label": "تفاصيل موازنات أجهزة مدى"
   },
   {
    "fieldname": "settlement_rows",
    "fieldtype": "Table",
-   "label": "Settlement Details",
+   "label": "تفاصيل الموازنة",
    "options": "Mada Settlement Entry Row",
    "reqd": 1
   },
@@ -85,7 +85,7 @@
   {
    "fieldname": "notes",
    "fieldtype": "Small Text",
-   "label": "Notes"
+   "label": "ملاحظات"
   }
  ],
  "grid_page_length": 50,

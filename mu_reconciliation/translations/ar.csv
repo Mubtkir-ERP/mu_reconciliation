@@ -2,6 +2,10 @@ Mu Reconciliation,مطابقة البنوك
 MU Reconciliation,مطابقة البنوك
 Bank Reconciliation,مطابقة البنوك
 Mada Reconciliation,مطابقة البنوك
+Operations & Reports,العمليات والتقارير
+Settlements & Terminals,الموازنات والأجهزة
+Bank Reconciliation & Reports,مطابقة البنوك والتقارير
+Settings,الإعدادات
 Mada Settlement Entry,تسجيل موازنة أجهزة مدى
 Mada Settlement Entry Row,تفاصيل موازنة أجهزة مدى
 Mada Bank Reconciliation,مطابقة كشف الحساب البنكي لمدى
@@ -10,6 +14,27 @@ Mada Terminal,أجهزة مدى
 Mada Terminal Assignment,تعيين أجهزة مدى
 Mada Reconciliation Settings,إعدادات مطابقة مدى
 Mada Reconciliation Status,تقرير حالة مطابقة مدى
+Commission VAT Input Account,حساب ضريبة مدخلات عمولة البنك
+VAT Input tax account on bank commissions,حساب ضريبة القيمة المضافة لعمولات البنك
+MADA Commission Expense Account,حساب مصروف عمولات مدى
+Expense Account in Chart of Accounts (e.g. Bank Charges & Commissions),حساب المصروف في دليل الحسابات (عمولات ورسوم بنكية)
+VAT Rate on Commission (%),نسبة ضريبة القيمة المضافة على العمولة (%)
+(%) VAT Rate on Commission,نسبة ضريبة القيمة المضافة على العمولة (%)
+Reconciliation Rules & Tolerances,قواعد ونسب التفاوت في المطابقة
+Terminal ID Regex Pattern (TID),النمط التعبيري لرقم الجهاز (TID)
+Date Tolerance (Days),نسبة التفاوت في الأيام (أيام)
+Amount Discrepancy Tolerance,نسبة التفاوت المالي المسموح بها
+Default Bank Account,حساب المصرف الافتراضي
+Assigned Driver / Employee,السائق / الموظف المستلم
+Reason / Note,سبب التسليم / ملاحظة
+Assignment Date & Time,تاريخ ووقت التسليم
+Assigned System User,مستخدم النظام
+Return Date & Time,تاريخ ووقت الإرجاع
+MADA Terminal Settlement Details,تفاصيل موازنات أجهزة مدى
+Settlement Details,تفاصيل الموازنة
+Posting Date,تاريخ الترحيل
+Total Settlement Amount,إجمالي مبالغ الموازنات
+Total Transactions,إجمالي عدد العمليات
 1. Parse Statement,1. قراءة وتحليل الكشف
 2. Reconcile Transactions,2. إجراء المطابقة الذكية
 3. Create Commission Entry,3. توليد قيد العمولة البنكية
@@ -42,7 +67,6 @@ Statement Description,بيان الحركة البنكية
 Settlement Amount,مبلغ الموازنة
 Settlement Date,تاريخ الموازنة
 Driver / Employee,السائق / الموظف
-Mada Terminal Settlement Details,تفاصيل موازنات أجهزة مدى
 Reconciled with Bank 🟢,مطابق بالبنك 🟢
 Pending / Unreconciled 🔴,معلق / غير مودع 🔴
 Unmatched Deposit 🟡,إيداع بدون موازنة 🟡
@@ -90,12 +114,6 @@ Transaction Count,عدد العمليات
 Bank Reconciliation Status,حالة المطابقة البنكية
 Notes,ملاحظات
 Branch,الفرع
-Total Settlement Amount,إجمالي مبالغ الموازنات
-Settlement Rows,تفاصيل أجهزة مدى
-Operations & Reports,العمليات والتقارير
-Settlements & Terminals,الموازنات والأجهزة
-Bank Reconciliation & Reports,مطابقة البنوك والتقارير
-Settings,الإعدادات
 8-digit MADA Terminal identifier as printed on receipt/bank statement (e.g. 15691146),رقم الجهاز 8 أرقام المطبوع على الإيصال أو كشف الحساب
 Select Branch,اختر الفرع
 Select Bank Account,اختر الحساب البنكي

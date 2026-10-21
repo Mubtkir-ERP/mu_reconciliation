@@ -20,33 +20,33 @@
    "fieldname": "txn_date",
    "fieldtype": "Date",
    "in_list_view": 1,
-   "label": "Transaction Date",
+   "label": "تاريخ الحركة بالبنك",
    "reqd": 1
   },
   {
    "fieldname": "terminal_id",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "Terminal ID (TID)",
+   "label": "رقم الجهاز (TID)",
    "reqd": 1
   },
   {
    "fieldname": "batch_no",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "Batch No"
+   "label": "رقم الموازنة (Batch No)"
   },
   {
    "fieldname": "credit_amount",
    "fieldtype": "Currency",
    "in_list_view": 1,
-   "label": "Deposit Amount (Credit)"
+   "label": "المبلغ المودع بالبنك (دائن)"
   },
   {
    "fieldname": "commission_amount",
    "fieldtype": "Currency",
    "in_list_view": 1,
-   "label": "Commission (Debit)"
+   "label": "العمولة المخصومة (مدين)"
   },
   {
    "fieldname": "column_break_6",
@@ -57,20 +57,20 @@
    "fieldname": "matched_status",
    "fieldtype": "Select",
    "in_list_view": 1,
-   "label": "Reconciliation Status",
+   "label": "حالة المطابقة",
    "options": "Matched 🟢\nPending / Unreconciled 🔴\nUnmatched Deposit 🟡\nمطابق 🟢\nمعلق / غير مودع 🔴\nإيداع بدون موازنة 🟡"
   },
   {
    "fieldname": "matched_entry",
    "fieldtype": "Link",
    "in_list_view": 1,
-   "label": "Matched Settlement Entry",
+   "label": "سند الموازنة المطابق",
    "options": "Mada Settlement Entry"
   },
   {
    "fieldname": "description",
-   "fieldtype": "Data",
-   "label": "Statement Description"
+   "fieldtype": "Small Text",
+   "label": "بيان الحركة البنكية"
   }
  ],
  "istable": 1,

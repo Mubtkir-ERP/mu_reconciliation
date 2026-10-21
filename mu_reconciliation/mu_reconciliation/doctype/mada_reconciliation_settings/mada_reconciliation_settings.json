@@ -18,16 +18,16 @@
   {
    "fieldname": "default_bank_account",
    "fieldtype": "Link",
-   "label": "Default Bank Account",
+   "label": "حساب المصرف الافتراضي",
    "options": "Account"
   },
   {
    "fieldname": "commission_expense_account",
    "fieldtype": "Link",
-   "label": "MADA Commission Expense Account",
+   "label": "حساب مصروف عمولات مدى",
    "options": "Account",
    "reqd": 1,
-   "description": "Expense Account in Chart of Accounts (e.g. Bank Charges & Commissions)"
+   "description": "حساب المصروف في دليل الحسابات (عمولات ورسوم بنكية)"
   },
   {
    "fieldname": "column_break_3",
@@ -36,38 +36,38 @@
   {
    "fieldname": "commission_vat_account",
    "fieldtype": "Link",
-   "label": "Commission VAT Input Account",
+   "label": "حساب ضريبة مدخلات عمولة البنك",
    "options": "Account",
-   "description": "VAT Input tax account on bank commissions"
+   "description": "حساب ضريبة القيمة المضافة لعمولات البنك"
   },
   {
    "default": "15",
    "fieldname": "vat_rate_on_commission",
    "fieldtype": "Percent",
-   "label": "VAT Rate on Commission (%)"
+   "label": "نسبة ضريبة القيمة المضافة على العمولة (%)"
   },
   {
    "fieldname": "section_break_6",
    "fieldtype": "Section Break",
-   "label": "Reconciliation Rules & Tolerances"
+   "label": "قواعد ونسب التفاوت في المطابقة"
   },
   {
    "default": "Term\\s*(\\d{8})",
    "fieldname": "settlement_regex",
    "fieldtype": "Data",
-   "label": "Terminal ID Regex Pattern (TID)"
+   "label": "النمط التعبيري لرقم الجهاز (TID)"
   },
   {
    "default": "2",
    "fieldname": "date_tolerance_days",
    "fieldtype": "Int",
-   "label": "Date Tolerance (Days)"
+   "label": "نسبة التفاوت في الأيام (أيام)"
   },
   {
    "default": "0.05",
    "fieldname": "amount_tolerance",
    "fieldtype": "Float",
-   "label": "Amount Discrepancy Tolerance"
+   "label": "نسبة التفاوت المالي المسموح بها"
   }
  ],
  "issingle": 1,

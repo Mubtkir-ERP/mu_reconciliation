@@ -271,7 +271,7 @@ def extract_mada_records_from_table(rows):
                 "batch_no": batch_no,
                 "credit": 0.0,
                 "commission": 0.0,
-                "description": row_str[:250]
+                "description": row_str[:135]
             }
 
         for n in numbers:
