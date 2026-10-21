@@ -31,35 +31,33 @@ def parse_date_str(val):
     if isinstance(val, (datetime,)):
         return val.strftime("%Y-%m-%d")
     s = str(val).translate(ARABIC_DIGITS).strip()
-    
-    # Try excel serial float
-    try:
-        f = float(s)
-        if 35000 < f < 65000:
-            return (datetime(1899, 12, 30) + timedelta(days=int(f))).strftime("%Y-%m-%d")
-    except Exception:
-        pass
+    if not s:
+        return None
+
+    # Must contain date separators (prevents converting amounts to dates)
+    if not any(sep in s for sep in ("-", "/", ".")):
+        return None
 
     # Standard date formats
-    for fmt in ("%Y-%m-%d", "%d/%m/%Y", "%m/%d/%Y", "%d-%m-%Y", "%Y/%m/%d"):
+    for fmt in ("%Y-%m-%d", "%d/%m/%Y", "%m/%d/%Y", "%d-%m-%Y", "%Y/%m/%d", "%d.%m.%Y", "%Y.%m.%d"):
         try:
             return datetime.strptime(s, fmt).strftime("%Y-%m-%d")
         except ValueError:
             pass
 
-    # Regex search for YYYY-MM-DD inside text
-    m = re.search(r"\b(202\d[-/]\d{1,2}[-/]\d{1,2})\b", s)
+    # Regex search for YYYY-MM-DD or YYYY/MM/DD or YYYY.MM.DD inside text
+    m = re.search(r"\b(202\d)[-/.](\d{1,2})[-/.](\d{1,2})\b", s)
     if m:
         try:
-            return str(getdate(m.group(1).replace("/", "-")))
+            return f"{m.group(1)}-{int(m.group(2)):02d}-{int(m.group(3)):02d}"
         except Exception:
             pass
 
-    # Regex search for DD/MM/YYYY
-    m = re.search(r"\b(\d{1,2}/\d{1,2}/202\d)\b", s)
+    # Regex search for DD/MM/YYYY or DD-MM-YYYY or DD.MM.YYYY
+    m = re.search(r"\b(\d{1,2})[-/.](\d{1,2})[-/.](202\d)\b", s)
     if m:
         try:
-            return datetime.strptime(m.group(1), "%d/%m/%Y").strftime("%Y-%m-%d")
+            return f"{m.group(3)}-{int(m.group(2)):02d}-{int(m.group(1)):02d}"
         except Exception:
             pass
 
@@ -115,9 +113,6 @@ def parse_xlsx(file_path):
         for c in r:
             if isinstance(c, (datetime,)):
                 row_vals.append(c.strftime("%Y-%m-%d"))
-            elif isinstance(c, float) and 35000 < c < 65000:
-                dt_str = parse_date_str(c)
-                row_vals.append(dt_str or str(c))
             elif c is not None:
                 row_vals.append(str(c).strip())
             else:
@@ -139,7 +134,7 @@ def parse_xls(file_path):
             for cx in range(ws.ncols):
                 val = ws.cell_value(rx, cx)
                 c_type = ws.cell_type(rx, cx)
-                if c_type == xlrd.XL_CELL_DATE or (isinstance(val, float) and 35000 < val < 65000):
+                if c_type == xlrd.XL_CELL_DATE:
                     try:
                         dt = xlrd.xldate_as_datetime(val, wb.datemode).strftime("%Y-%m-%d")
                         row_vals.append(dt)
@@ -186,21 +181,31 @@ def extract_mada_records_from_table(rows):
     Parses structured tabular data (from Excel/CSV).
     Pairs Batch Deposits with their corresponding Commission rows.
     """
-    # Key: (TID, Date, BatchNo) -> dict
     batch_map = {}
 
     for row in rows:
         if not row:
             continue
         row_str = " ".join(str(c) for c in row)
-        match_tid = re.search(r"Term\s*(\d{8})", row_str, re.IGNORECASE)
-        if not match_tid:
+        
+        # Match terminal ID with flexible labels (Term, Terminal, TID, جهاز, رقم الجهاز, POS)
+        match_tid = re.search(r"(?:Term|Terminal|TID|جهاز|رقم\s*الجهاز|POS)\s*[:#-]?\s*(\d{8})", row_str, re.IGNORECASE)
+        tid = ""
+        if match_tid:
+            tid = match_tid.group(1)
+        else:
+            # Fallback: check if row mentions MADA / POS / Settlement and contains an 8-digit number
+            if any(k in row_str.lower() for k in ("mada", "مدى", "pos", "point of sale", "عمولة", "تسوية", "شبكة", "deposit", "settlement")):
+                fallback_tid = re.search(r"\b(\d{8})\b", row_str)
+                if fallback_tid:
+                    tid = fallback_tid.group(1)
+
+        if not tid:
             continue
 
-        tid = match_tid.group(1)
         is_commission = "commission" in row_str.lower() or "عمولة" in row_str
 
-        # Search for date in row
+        # Search for date in row cells first
         txn_date = None
         for cell in row:
             d = parse_date_str(cell)
@@ -210,9 +215,13 @@ def extract_mada_records_from_table(rows):
 
         # Fallback date search in entire row_str
         if not txn_date:
-            date_m = re.search(r"\b(202\d-\d{2}-\d{2})\b", row_str)
+            date_m = re.search(r"\b(202\d[-/.]\d{1,2}[-/.]\d{1,2})\b", row_str)
             if date_m:
-                txn_date = date_m.group(1)
+                txn_date = parse_date_str(date_m.group(1))
+            if not txn_date:
+                date_m2 = re.search(r"\b(\d{1,2}[-/.]\d{1,2}[-/.]202\d)\b", row_str)
+                if date_m2:
+                    txn_date = parse_date_str(date_m2.group(1))
 
         # Extract batch number if present (6 digits sequence)
         batch_no = ""

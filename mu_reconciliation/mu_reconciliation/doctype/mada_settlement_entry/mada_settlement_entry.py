@@ -18,10 +18,13 @@ class MadaSettlementEntry(Document):
         for row in self.get("settlement_rows") or []:
             total_amount += flt(row.amount)
             total_txns += cint(row.transaction_count)
-            if row.terminal and not row.terminal_id:
-                row.terminal_id = frappe.db.get_value("Mada Terminal", row.terminal, "terminal_id")
-            if row.terminal and not row.employee:
-                row.employee = frappe.db.get_value("Mada Terminal", row.terminal, "current_employee")
+            if not row.settlement_date:
+                row.settlement_date = self.entry_date
+            if row.terminal:
+                if not row.terminal_id:
+                    row.terminal_id = frappe.db.get_value("Mada Terminal", row.terminal, "terminal_id") or row.terminal
+                if not row.employee:
+                    row.employee = frappe.db.get_value("Mada Terminal", row.terminal, "current_employee")
 
         self.total_settlement_amount = total_amount
         self.total_transactions = total_txns

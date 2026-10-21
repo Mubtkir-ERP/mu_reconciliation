@@ -59,7 +59,7 @@ class MadaBankReconciliation(Document):
                 rec_date_str = rec.get("date")
                 rec_date = getdate(rec_date_str) if rec_date_str else None
 
-                # Filter strictly by date range if provided
+                # Filter by date range if transaction date was detected
                 if from_d and rec_date and rec_date < from_d:
                     continue
                 if to_d and rec_date and rec_date > to_d:
@@ -88,8 +88,13 @@ class MadaBankReconciliation(Document):
         if not self.statement_rows:
             self.parse_statement()
 
-        from_d = self.from_date or "2000-01-01"
-        to_d = self.to_date or "2099-12-31"
+        from datetime import timedelta
+        from_d = getdate(self.from_date) if self.from_date else getdate("2000-01-01")
+        to_d = getdate(self.to_date) if self.to_date else getdate("2099-12-31")
+
+        # Query window: extend slightly (+/- 4 days) to account for weekend/holiday clearing delays
+        query_from = from_d - timedelta(days=4)
+        query_to = to_d + timedelta(days=4)
 
         # 1. Fetch system settlements within date range (support both Draft and Submitted)
         system_settlements = frappe.db.sql(
@@ -97,16 +102,18 @@ class MadaBankReconciliation(Document):
             SELECT 
                 r.name as row_name,
                 r.parent as entry_name,
-                r.terminal_id,
+                r.terminal,
+                COALESCE(NULLIF(r.terminal_id, ''), t.terminal_id, r.terminal) as terminal_id,
                 r.batch_no,
-                r.settlement_date,
+                COALESCE(r.settlement_date, p.entry_date) as settlement_date,
                 r.amount
             FROM `tabMada Settlement Entry Row` r
             INNER JOIN `tabMada Settlement Entry` p ON p.name = r.parent
+            LEFT JOIN `tabMada Terminal` t ON t.name = r.terminal
             WHERE p.docstatus < 2
-              AND r.settlement_date BETWEEN %s AND %s
+              AND COALESCE(r.settlement_date, p.entry_date) BETWEEN %s AND %s
             """,
-            (from_d, to_d),
+            (query_from, query_to),
             as_dict=True
         )
 
@@ -121,48 +128,57 @@ class MadaBankReconciliation(Document):
             b_tid = str(bank_row.terminal_id or "").strip()
             b_date = getdate(bank_row.txn_date) if bank_row.txn_date else None
             b_amt = flt(bank_row.credit_amount)
+            b_comm = flt(bank_row.commission_amount)
+            b_net = b_amt - b_comm if b_comm > 0 else b_amt
+            b_batch = str(bank_row.batch_no or "").strip()
 
             if b_amt <= 0:
                 continue
 
             match = None
 
-            # Priority 1: Terminal ID + Amount + Date proximity (<= 3 days)
-            for s in system_settlements:
-                if s.row_name in matched_system_rows:
-                    continue
-                s_tid = str(s.terminal_id or "").strip()
-                s_amt = flt(s.amount)
-                s_date = getdate(s.settlement_date) if s.settlement_date else None
-                days_diff = abs((b_date - s_date).days) if (b_date and s_date) else 999
+            # Priority 1: Batch No match (when batch numbers are recorded)
+            if b_batch:
+                for s in system_settlements:
+                    if s.row_name in matched_system_rows:
+                        continue
+                    s_batch = str(s.batch_no or "").strip()
+                    s_amt = flt(s.amount)
+                    if s_batch and s_batch == b_batch:
+                        if abs(s_amt - b_amt) < 0.5 or abs(s_amt - b_net) < 0.5:
+                            match = s
+                            break
 
-                if s_tid and b_tid and s_tid == b_tid and abs(s_amt - b_amt) < 0.05 and days_diff <= 3:
-                    match = s
-                    break
-
-            # Priority 2: Terminal ID + Amount (any date in statement period)
-            if not match:
+            # Priority 2: Terminal ID + Amount (Gross or Net) + Proximity (<= 4 days)
+            if not match and b_tid:
                 for s in system_settlements:
                     if s.row_name in matched_system_rows:
                         continue
                     s_tid = str(s.terminal_id or "").strip()
                     s_amt = flt(s.amount)
-                    if s_tid and b_tid and s_tid == b_tid and abs(s_amt - b_amt) < 0.05:
+                    s_date = getdate(s.settlement_date) if s.settlement_date else None
+                    days_diff = abs((b_date - s_date).days) if (b_date and s_date) else 999
+
+                    tid_matches = (s_tid and s_tid == b_tid) or (s.terminal and str(s.terminal).strip() == b_tid)
+                    amt_matches = (abs(s_amt - b_amt) < 0.05) or (abs(s_amt - b_net) < 0.05)
+
+                    if tid_matches and amt_matches and days_diff <= 4:
                         match = s
                         break
 
-            # Priority 3: Exact Amount + Exact Date (even if TID didn't parse from statement)
+            # Priority 3: Exact Amount (Gross or Net) + Exact Date
             if not match:
                 for s in system_settlements:
                     if s.row_name in matched_system_rows:
                         continue
                     s_amt = flt(s.amount)
                     s_date = getdate(s.settlement_date) if s.settlement_date else None
-                    if abs(s_amt - b_amt) < 0.05 and b_date and s_date and b_date == s_date:
+                    amt_matches = (abs(s_amt - b_amt) < 0.05) or (abs(s_amt - b_net) < 0.05)
+                    if amt_matches and b_date and s_date and b_date == s_date:
                         match = s
                         break
 
-            # Priority 4: Exact Amount with Date proximity (<= 2 days)
+            # Priority 4: Exact Amount (Gross or Net) with Date Proximity (<= 3 days)
             if not match:
                 for s in system_settlements:
                     if s.row_name in matched_system_rows:
@@ -170,7 +186,19 @@ class MadaBankReconciliation(Document):
                     s_amt = flt(s.amount)
                     s_date = getdate(s.settlement_date) if s.settlement_date else None
                     days_diff = abs((b_date - s_date).days) if (b_date and s_date) else 999
-                    if abs(s_amt - b_amt) < 0.05 and days_diff <= 2:
+                    amt_matches = (abs(s_amt - b_amt) < 0.05) or (abs(s_amt - b_net) < 0.05)
+                    if amt_matches and days_diff <= 3:
+                        match = s
+                        break
+
+            # Priority 5: Exact Amount (Gross or Net) anywhere within statement period
+            if not match:
+                for s in system_settlements:
+                    if s.row_name in matched_system_rows:
+                        continue
+                    s_amt = flt(s.amount)
+                    amt_matches = (abs(s_amt - b_amt) < 0.05) or (abs(s_amt - b_net) < 0.05)
+                    if amt_matches:
                         match = s
                         break
 
