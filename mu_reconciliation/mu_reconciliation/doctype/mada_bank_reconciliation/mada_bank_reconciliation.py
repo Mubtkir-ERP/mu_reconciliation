@@ -300,7 +300,9 @@ class MadaBankReconciliation(Document):
         je.voucher_type = "Bank Entry"
         je.company = company
         je.posting_date = self.to_date or nowdate()
-        je.user_remark = f"MADA Bank Commission Entry for period {self.from_date} to {self.to_date} - Ref: {self.name}"
+        je.cheque_no = self.name
+        je.cheque_date = self.to_date or nowdate()
+        je.user_remark = f"قيد إثبات عمولات شبكة مدى للفترة من {self.from_date} إلى {self.to_date} - مرجع: {self.name}"
 
         je.append("accounts", {
             "account": expense_acc,
@@ -320,7 +322,8 @@ class MadaBankReconciliation(Document):
         je.append("accounts", {
             "account": bank_acc,
             "debit_in_account_currency": 0,
-            "credit_in_account_currency": total_comm
+            "credit_in_account_currency": total_comm,
+            "cost_center": frappe.db.get_value("Company", company, "cost_center")
         })
 
         je.insert(ignore_permissions=True)
