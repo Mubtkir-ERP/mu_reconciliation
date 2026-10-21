@@ -1,12 +1,13 @@
 {
  "actions": [],
  "allow_rename": 1,
- "autoname": "field:terminal_id",
+ "autoname": "naming_series:",
  "creation": "2026-10-18 19:30:00.000000",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
+  "naming_series",
   "terminal_id",
   "terminal_name",
   "status",
@@ -24,6 +25,14 @@
   "assignment_history"
  ],
  "fields": [
+  {
+   "default": "M-.####",
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "label": "Naming Series",
+   "options": "M-.####",
+   "reqd": 1
+  },
   {
    "fieldname": "terminal_id",
    "fieldtype": "Data",

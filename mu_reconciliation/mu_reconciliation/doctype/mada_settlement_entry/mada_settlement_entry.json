@@ -21,11 +21,11 @@
  ],
  "fields": [
   {
-   "default": "MADA-SETT-.YYYY.-.#####",
+   "default": "MADA-.YY.-.MM.-.####",
    "fieldname": "naming_series",
    "fieldtype": "Select",
    "label": "Naming Series",
-   "options": "MADA-SETT-.YYYY.-.#####",
+   "options": "MADA-.YY.-.MM.-.####",
    "reqd": 1
   },
   {

@@ -28,11 +28,11 @@
  ],
  "fields": [
   {
-   "default": "MADA-RECON-.YYYY.-.#####",
+   "default": "BR-.YY.-.#####",
    "fieldname": "naming_series",
    "fieldtype": "Select",
    "label": "Naming Series",
-   "options": "MADA-RECON-.YYYY.-.#####",
+   "options": "BR-.YY.-.#####",
    "reqd": 1
   },
   {
