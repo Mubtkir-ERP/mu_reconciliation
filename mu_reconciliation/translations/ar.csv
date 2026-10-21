@@ -14,6 +14,18 @@ Mada Terminal,أجهزة مدى
 Mada Terminal Assignment,تعيين أجهزة مدى
 Mada Reconciliation Settings,إعدادات مطابقة مدى
 Mada Reconciliation Status,تقرير حالة مطابقة مدى
+Terminal ID (TID),رقم الجهاز (TID)
+Terminal Name / Driver,اسم الجهاز / السائق
+Branch,الفرع
+Settlement Date,تاريخ الموازنة
+Batch No,رقم الموازنة (Batch No)
+System Amount,المبلغ بالنظام
+Deposited in Bank,المودع بالبنك
+Pending Amount,المبلغ المعلق
+Bank Commission,عمولة البنك
+Reconciliation Status,حالة المطابقة
+Pending Bank Deposit 🔴,معلق في انتظار الإيداع 🔴
+Reconciled with Bank 🟢,مطابق بالبنك 🟢
 Commission VAT Input Account,حساب ضريبة مدخلات عمولة البنك
 VAT Input tax account on bank commissions,حساب ضريبة القيمة المضافة لعمولات البنك
 MADA Commission Expense Account,حساب مصروف عمولات مدى
@@ -48,8 +60,8 @@ Total Bank Deposits,إجمالي إيداعات مدى في البنك
 Total Bank Commissions,إجمالي عمولات البنك
 Total Matched Amount,إجمالي المبالغ المطابقة
 Total Matched Amount 🟢,إجمالي المبالغ المطابقة 🟢
-Missing / Pending in Bank,المبالغ المعلقة / المفقودة من البنك
-Missing / Pending in Bank 🔴,المبالغ المعلقة / المفقودة من البنك 🔴
+Missing / Pending in Bank,المبالغ المعلقة في انتظار الإيداع
+Missing / Pending in Bank 🔴,المبالغ المعلقة في انتظار الإيداع 🔴
 Unmatched Deposits,إيداعات بنكية بدون موازنة
 Unmatched Deposits 🟡,إيداعات بنكية بدون موازنة 🟡
 Matched & Deposited in Bank 🟢,المطابق والمودع بالبنك 🟢
@@ -57,18 +69,13 @@ Bank Commissions Deducted 💳,عمولات البنك المحسومة 💳
 Commission Journal Entry,سند قيد العمولة البنكية
 Statement Rows,حركات الكشف البنكي
 Transaction Date,تاريخ الحركة بالبنك
-Terminal ID (TID),رقم الجهاز (TID)
-Batch No,رقم الموازنة (Batch No)
 Deposit Amount (Credit),المبلغ المودع بالبنك (دائن)
 Commission (Debit),العمولة المخصومة (مدين)
-Reconciliation Status,حالة المطابقة
 Matched Settlement Entry,سند الموازنة المطابق
 Statement Description,بيان الحركة البنكية
 Settlement Amount,مبلغ الموازنة
-Settlement Date,تاريخ الموازنة
 Driver / Employee,السائق / الموظف
-Reconciled with Bank 🟢,مطابق بالبنك 🟢
-Pending / Unreconciled 🔴,معلق / غير مودع 🔴
+Pending / Unreconciled 🔴,معلق في انتظار الإيداع 🔴
 Unmatched Deposit 🟡,إيداع بدون موازنة 🟡
 Matched 🟢,مطابق 🟢
 Variance / Discrepancy 🔴,عجز / زيادة 🔴
@@ -113,7 +120,6 @@ Assignment History,سجل التسليم والعهدة
 Transaction Count,عدد العمليات
 Bank Reconciliation Status,حالة المطابقة البنكية
 Notes,ملاحظات
-Branch,الفرع
 8-digit MADA Terminal identifier as printed on receipt/bank statement (e.g. 15691146),رقم الجهاز 8 أرقام المطبوع على الإيصال أو كشف الحساب
 Select Branch,اختر الفرع
 Select Bank Account,اختر الحساب البنكي

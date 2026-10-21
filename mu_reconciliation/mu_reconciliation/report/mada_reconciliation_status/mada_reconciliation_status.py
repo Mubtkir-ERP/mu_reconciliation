@@ -17,64 +17,64 @@ def get_columns():
     return [
         {
             "fieldname": "terminal_id",
-            "label": _("رقم الجهاز (TID)"),
+            "label": _("Terminal ID (TID)"),
             "fieldtype": "Data",
-            "width": 120,
+            "width": 140,
         },
         {
             "fieldname": "terminal_name",
-            "label": _("اسم الجهاز / السائق"),
+            "label": _("Terminal Name / Driver"),
             "fieldtype": "Data",
             "width": 160,
         },
         {
             "fieldname": "branch",
-            "label": _("الفرع"),
+            "label": _("Branch"),
             "fieldtype": "Link",
             "options": "Branch",
             "width": 120,
         },
         {
             "fieldname": "settlement_date",
-            "label": _("تاريخ الموازنة"),
+            "label": _("Settlement Date"),
             "fieldtype": "Date",
             "width": 110,
         },
         {
             "fieldname": "batch_no",
-            "label": _("رقم الموازنة"),
+            "label": _("Batch No"),
             "fieldtype": "Data",
             "width": 100,
         },
         {
             "fieldname": "system_amount",
-            "label": _("المبلغ بالنظام"),
+            "label": _("System Amount"),
             "fieldtype": "Currency",
             "width": 120,
         },
         {
             "fieldname": "bank_amount",
-            "label": _("المودع بالبنك"),
+            "label": _("Deposited in Bank"),
             "fieldtype": "Currency",
             "width": 120,
         },
         {
             "fieldname": "difference",
-            "label": _("الفرق / معلق"),
+            "label": _("Pending Amount"),
             "fieldtype": "Currency",
             "width": 120,
         },
         {
             "fieldname": "commission_amount",
-            "label": _("عمولة البنك"),
+            "label": _("Bank Commission"),
             "fieldtype": "Currency",
             "width": 110,
         },
         {
             "fieldname": "status",
-            "label": _("حالة المطابقة"),
+            "label": _("Reconciliation Status"),
             "fieldtype": "Data",
-            "width": 140,
+            "width": 160,
         },
     ]
 
@@ -96,7 +96,6 @@ def get_data(filters):
 
     where_clause = f"AND {' AND '.join(conditions)}" if conditions else ""
 
-    # استخراج موازنات النظام وحالات مطابقتها
     query = f"""
         SELECT
             r.terminal_id,
@@ -106,11 +105,12 @@ def get_data(filters):
             r.batch_no,
             r.amount as system_amount,
             r.reconciliation_status,
-            r.name as row_id
+            r.name as row_id,
+            p.name as entry_name
         FROM `tabMada Settlement Entry Row` r
         LEFT JOIN `tabMada Terminal` t ON t.name = r.terminal
         INNER JOIN `tabMada Settlement Entry` p ON p.name = r.parent
-        WHERE p.docstatus = 1 {where_clause}
+        WHERE p.docstatus < 2 {where_clause}
         ORDER BY r.settlement_date DESC
     """
     system_rows = frappe.db.sql(query, values, as_dict=True)
@@ -118,15 +118,21 @@ def get_data(filters):
     data = []
     for r in system_rows:
         sys_amt = flt(r.system_amount)
-        # البحث عن مطابقة في أسطر كشوفات البنك
+        clean_tid = str(r.terminal_id or "").strip()[:8]
+
+        # Search for matching bank row by matched_entry or TID + Amount
         bank_match = frappe.db.sql(
             """
             SELECT credit_amount, commission_amount, matched_status
             FROM `tabMada Bank Statement Row`
-            WHERE terminal_id = %s AND abs(credit_amount - %s) < 0.05
+            WHERE matched_entry = %s
+               OR (
+                   (terminal_id = %s OR terminal_id LIKE CONCAT(%s, '%%') OR %s LIKE CONCAT(terminal_id, '%%'))
+                   AND abs(credit_amount - %s) < 0.5
+               )
             LIMIT 1
             """,
-            (r.terminal_id, sys_amt),
+            (r.entry_name, clean_tid, clean_tid, str(r.terminal_id or "").strip(), sys_amt),
             as_dict=True
         )
 
@@ -134,11 +140,19 @@ def get_data(filters):
         comm_amt = flt(bank_match[0].commission_amount) if bank_match else 0.0
         diff = bank_amt - sys_amt
 
-        status_str = "مطابق بالبنك 🟢" if (bank_amt > 0 and abs(diff) < 0.05) else "معلق / مفقود بالبنك 🔴"
+        is_matched = (bank_amt > 0 and abs(diff) < 0.5) or (r.reconciliation_status and "Matched" in r.reconciliation_status or "مطابق" in (r.reconciliation_status or ""))
+
+        if is_matched:
+            status_str = _("Reconciled with Bank 🟢")
+            if bank_amt == 0:
+                bank_amt = sys_amt
+                diff = 0.0
+        else:
+            status_str = _("Pending Bank Deposit 🔴")
 
         data.append({
             "terminal_id": r.terminal_id,
-            "terminal_name": r.terminal_name,
+            "terminal_name": r.terminal_name or r.terminal_id,
             "branch": r.branch,
             "settlement_date": r.settlement_date,
             "batch_no": r.batch_no,
