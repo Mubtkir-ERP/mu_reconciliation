@@ -43,6 +43,7 @@ class MadaBankReconciliation(Document):
     @frappe.whitelist()
     def parse_statement(self):
         """Parse and extract MADA transactions from uploaded bank statement file."""
+        self.check_permission("write")
         if not self.bank_statement_file:
             frappe.throw(_("Please attach the bank statement file first (Excel, PDF, or CSV)."))
 
@@ -113,10 +114,8 @@ class MadaBankReconciliation(Document):
         self.status = "Parsed"
         self.calculate_summary()
         self.save()
-        frappe.db.commit()
         return {"status": "success", "rows_added": added, "total_in_file": total_in_file}
 
-    @frappe.whitelist()
     def on_cancel(self):
         self.reset_reconciled_rows()
 
@@ -137,6 +136,7 @@ class MadaBankReconciliation(Document):
     @frappe.whitelist()
     def run_reconciliation(self):
         """Intelligently reconcile bank statement deposits with system settlement entries."""
+        self.check_permission("write")
         if not self.statement_rows:
             self.parse_statement()
 
@@ -324,7 +324,6 @@ class MadaBankReconciliation(Document):
         self.status = "Reconciled"
         self.calculate_summary()
         self.save()
-        frappe.db.commit()
 
         return {
             "status": "success",
@@ -336,6 +335,10 @@ class MadaBankReconciliation(Document):
     @frappe.whitelist()
     def create_commission_journal_entry(self):
         """Create and submit a Journal Entry for bank commissions."""
+        self.check_permission("write")
+        if not frappe.has_permission("Journal Entry", "create"):
+            frappe.throw(_("Not permitted to create Journal Entry"), frappe.PermissionError)
+
         if self.commission_journal_entry and frappe.db.exists("Journal Entry", self.commission_journal_entry):
             frappe.throw(_("Commission Journal Entry already exists: {0}").format(self.commission_journal_entry))
 
@@ -362,6 +365,10 @@ class MadaBankReconciliation(Document):
             net_expense = flt(total_comm / (1.0 + (vat_rate / 100.0)), 2)
             vat_amount = flt(total_comm - net_expense, 2)
 
+        cost_center = frappe.db.get_value("Company", company, "cost_center")
+        if not cost_center:
+            cost_center = frappe.db.get_value("Cost Center", {"company": company, "is_group": 0}, "name")
+
         je = frappe.new_doc("Journal Entry")
         je.voucher_type = "Bank Entry"
         je.company = company
@@ -374,7 +381,7 @@ class MadaBankReconciliation(Document):
             "account": expense_acc,
             "debit_in_account_currency": net_expense,
             "credit_in_account_currency": 0,
-            "cost_center": frappe.db.get_value("Company", company, "cost_center")
+            "cost_center": cost_center
         })
 
         if vat_acc and vat_amount > 0:
@@ -382,14 +389,14 @@ class MadaBankReconciliation(Document):
                 "account": vat_acc,
                 "debit_in_account_currency": vat_amount,
                 "credit_in_account_currency": 0,
-                "cost_center": frappe.db.get_value("Company", company, "cost_center")
+                "cost_center": cost_center
             })
 
         je.append("accounts", {
             "account": bank_acc,
             "debit_in_account_currency": 0,
             "credit_in_account_currency": total_comm,
-            "cost_center": frappe.db.get_value("Company", company, "cost_center")
+            "cost_center": cost_center
         })
 
         je.insert(ignore_permissions=True)
@@ -398,6 +405,5 @@ class MadaBankReconciliation(Document):
         self.commission_journal_entry = je.name
         self.status = "Commission Created"
         self.save()
-        frappe.db.commit()
 
         return {"status": "success", "journal_entry": je.name}

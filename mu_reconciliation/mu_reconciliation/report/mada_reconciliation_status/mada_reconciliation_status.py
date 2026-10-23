@@ -116,29 +116,35 @@ def get_data(filters):
     """
     system_rows = frappe.db.sql(query, values, as_dict=True)
 
+    # Pre-fetch bank statement rows to eliminate N+1 database queries
+    bank_rows = frappe.db.sql(
+        """
+        SELECT matched_entry, terminal_id, credit_amount, commission_amount, matched_status
+        FROM `tabMada Bank Statement Row`
+        WHERE matched_entry IS NOT NULL OR credit_amount > 0
+        """,
+        as_dict=True
+    )
+    bank_by_entry = {b.matched_entry: b for b in bank_rows if b.matched_entry}
+
     data = []
     for r in system_rows:
         sys_amt = flt(r.system_amount)
         clean_tid = str(r.terminal_id or "").strip()[:8]
 
-        # Search for matching bank row by matched_entry or TID + Amount
-        bank_match = frappe.db.sql(
-            """
-            SELECT credit_amount, commission_amount, matched_status
-            FROM `tabMada Bank Statement Row`
-            WHERE matched_entry = %s
-               OR (
-                   (terminal_id = %s OR terminal_id LIKE CONCAT(%s, '%%') OR %s LIKE CONCAT(terminal_id, '%%'))
-                   AND abs(credit_amount - %s) < 0.5
-               )
-            LIMIT 1
-            """,
-            (r.entry_name, clean_tid, clean_tid, str(r.terminal_id or "").strip(), sys_amt),
-            as_dict=True
-        )
+        # Fast in-memory matching by matched_entry or TID + Amount
+        bank_match = bank_by_entry.get(r.entry_name)
+        if not bank_match and clean_tid:
+            full_tid = str(r.terminal_id or "").strip()
+            for b in bank_rows:
+                b_tid = str(b.terminal_id or "").strip()
+                if b_tid and (b_tid == clean_tid or b_tid.startswith(clean_tid) or clean_tid.startswith(b_tid) or full_tid.startswith(b_tid)):
+                    if abs(flt(b.credit_amount) - sys_amt) < 0.5:
+                        bank_match = b
+                        break
 
-        bank_amt = flt(bank_match[0].credit_amount) if bank_match else 0.0
-        comm_amt = flt(bank_match[0].commission_amount) if bank_match else 0.0
+        bank_amt = flt(bank_match.credit_amount) if bank_match else 0.0
+        comm_amt = flt(bank_match.commission_amount) if bank_match else 0.0
         diff = bank_amt - sys_amt
 
         is_matched = (bank_amt > 0 and abs(diff) < 0.5) or (r.reconciliation_status and "Matched" in r.reconciliation_status or "مطابق" in (r.reconciliation_status or ""))
