@@ -1,3 +1,21 @@
+<!-- MUBTKIR-UNIFIED-README-START -->
+## نظام مطابقة مبيعات مدى والبنوك | MU Reconciliation
+
+نظام ذكي لمطابقة مبيعات أجهزة نقاط البيع (مدى) وموازنات الشبكة مع كشوف الحسابات البنكية.
+* **الفئة المستهدفة:** الإدارات المالية والمحاسبية في قطاع التجزئة والمطاعم والخدمات.
+
+Automated reconciliation of Mada POS terminal settlements with bank statements in ERPNext.
+* **Target Audience:** Finance and accounting teams in retail, F&B, and multi-branch businesses.
+
+### تواصل معنا | Contact & Sales — [مبتكر للأنظمة السحابية | Mubtkir ERP](https://mubtkir.com)
+
+* 🌐 **الموقع الرسمي | Website:** [Mubtkir ERP — حلول ERPNext السحابية](https://mubtkir.com)
+* 📧 **البريد الإلكتروني | Email:** [sales@mubtkir.com](mailto:sales@mubtkir.com)
+* 📱 **الجوال | Mobile:** [+966547706865](tel:+966547706865)
+* 💬 **واتساب | WhatsApp:** [+966126810486](https://wa.me/966126810486)
+
+<!-- MUBTKIR-UNIFIED-README-END -->
+
 # MU Reconciliation (مطابقة مبيعات مدى والبنوك)
 
 تطبيق متكامل لنظام ERPNext / Frappe مطور خصيصاً بواسطة **Mubtkir** (https://www.mubtkir.com) لمطابقة مبيعات شبكة مدى وموازنات الأجهزة اليدوية مع كشوف الحسابات البنكية.
